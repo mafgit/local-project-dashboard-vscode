@@ -15,13 +15,35 @@
     "commands": [
       {
         "command": "local-project-opener.openProject",
-        "title": "Local Project Opener: Open Project"
+        "title": "Local Project Opener: Open A Project In New Window"
       },
       {
         "command": "local-project-opener.refreshDirectories",
         "title": "Local Project Opener: Refresh Directories"
+      },
+      {
+        "command": "local-project-opener.openProjectsView",
+        "title": "Local Project Opener: Open Projects View"
       }
-    ]
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "icon": "media/assets/icon.svg",
+          "id": "local-project-opener-view",
+          "title": "Local Project Opener"
+        }
+      ]
+    },
+    "views": {
+      "localProjectOpener": [
+        {
+          "id": "local-project-opener-view",
+          "name": "Local Project Opener",
+          "icon": "media/assets/icon.svg"
+        }
+      ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",

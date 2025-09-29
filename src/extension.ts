@@ -1,71 +1,17 @@
 import * as vscode from "vscode";
 import fs from "fs/promises";
 import path from "path";
+import { walkHelper } from "./utils/walk";
+import { getWebviewHTML } from "./utils/webview";
 
 export async function activate(context: vscode.ExtensionContext) {
+  // vscode.window.registerTreeDataProvider(
+  //   "local-project-opener-view",
+  //   new vscode
+  // )
   console.log("Welcome to Local Project Opener!");
   let dirs: Record<string, string[]> = { "C:\\Users\\DC\\codes": [] };
   let arr: (vscode.QuickPickItem & { path: string })[] = [];
-
-  let maxDepth = 1; // 1 or more
-  const ignoreFolders = new Set([
-    "venv",
-    "node_modules",
-    "build",
-    "dist",
-    "out",
-    "target",
-    "vendor",
-    "env",
-    ".venv",
-    ".vscode",
-    ".idea",
-    "__pycache__",
-    "bin",
-    "obj",
-  ]);
-
-  const acceptExts = new Set([
-    ".js",
-    ".jsx",
-    ".ts",
-    ".tsx",
-    ".cjs",
-    ".mjs",
-    ".mts",
-    ".cts",
-    ".py",
-    ".pyi",
-    ".java",
-    ".groovy",
-    ".c",
-    ".cpp",
-    ".cc",
-    ".cxx",
-    ".h",
-    ".hpp",
-    ".hh",
-    ".hxx",
-    ".cs",
-    ".go",
-    ".rs",
-    ".php",
-    ".phtml",
-    ".rb",
-    ".rake",
-    ".swift",
-    ".kt",
-    ".kts",
-    ".sh",
-    ".bash",
-    ".zsh",
-    ".bat",
-    ".cmd",
-    ".asm",
-    ".s",
-    ".r",
-    ".R",
-  ]);
 
   async function refreshDirectories() {
     await vscode.window.withProgress(
@@ -76,60 +22,23 @@ export async function activate(context: vscode.ExtensionContext) {
         cancellable: true,
       },
       async (progress, token) => {
-        progress.report({ increment: 0, message: '...' });
+        progress.report({ increment: 0, message: "..." });
         arr = [];
 
-        console.log('AAAAAAAAAAAAA');
-        
         for (const dir of Object.keys(dirs)) {
           const data = await fs.readdir(dir);
           dirs[dir] = data;
-        console.log('BBBBBBBBBBB', data);
 
           for (let value of data) {
-            console.log(value);
-
             const item = {
               path: path.join(dir, value),
               label: `$(folder) ${value}`,
               detail: "",
             };
 
-            // sub-files check
-            const currentProjectFiles: string[] = [];
-            for (let i = 1; i <= maxDepth; i++) {
-              try {
-                const dirents = await fs.readdir(item.path, {
-                  withFileTypes: true,
-                });
-                for (let dirent of dirents) {
-                  if (token.isCancellationRequested) break;
-                  const pathToFile = path.join(item.path, dirent.name);
-                  if (dirent.isFile()) {
-                    const ext = path.extname(pathToFile);
-                    if (acceptExts.has(ext)) {
-                      currentProjectFiles.push(ext);
-                    }
-                  } else {
-                    if (!ignoreFolders.has(dirent.name)) {
-                    }
-                  }
-                }
-              } catch (err) {
-                continue;
-              }
-            }
+            const extCount = await walkHelper(item.path, 3);
 
-            const uniques = new Set(currentProjectFiles);
-            const percentages: Record<string, number> = {};
-            uniques.forEach((item) => {
-              percentages[item] =
-                (currentProjectFiles.filter((x) => x === item).length /
-                  currentProjectFiles.length) *
-                100;
-            });
-
-            const entries = Object.entries(percentages);
+            const entries = Object.entries(extCount);
             entries.sort((a, b) => b[1] - a[1]);
 
             for (let [key, value] of entries) {
@@ -174,7 +83,33 @@ export async function activate(context: vscode.ExtensionContext) {
     refreshDirectories
   );
 
-  context.subscriptions.push(disposable1, disposable2);
+  const disposable3 = vscode.commands.registerCommand(
+    "local-project-opener.openProjectsView",
+    () => {
+      const panel = vscode.window.createWebviewPanel(
+        "localProjectOpenerWebview",
+        "Local Project Opener",
+        vscode.ViewColumn.One,
+        {
+          retainContextWhenHidden: false,
+          enableScripts: true,
+          localResourceRoots: [
+            vscode.Uri.file(path.join(context.extensionPath,'src', "media")),
+          ],
+        }
+      );
+
+      const getUri = (file: string) => {
+        return panel.webview.asWebviewUri(
+          vscode.Uri.file(path.join(context.extensionPath,'src', "media", file))
+        ).toString()
+      };
+
+      panel.webview.html = getWebviewHTML(panel.webview.cspSource, getUri);
+    }
+  );
+
+  context.subscriptions.push(disposable1, disposable2, disposable3);
 }
 
 // This method is called when your extension is deactivated
