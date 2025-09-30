@@ -98,15 +98,62 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'nonce-${nonce}';">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'nonce-${nonce}'; style-src vscode-resource: 'unsafe-inline'">
     <title>Local Project Opener</title>
+    <style nonce="${nonce}">
+      * {margin: 0; padding: 0; box-sizing: border-box;}
+
+      button {
+        cursor: pointer;
+        background: #1553ffff;
+        padding: 10px 10px;
+        color: white;
+        border-radius: 5px;
+        width: 100%;
+        outline: none;
+        border: none;
+
+        &.remove-btn {
+          font-size: 12px !important;
+          padding: 5px !important;
+          width: max-content !important;
+        }
+      }
+
+      body {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        padding: 10px;
+      }
+
+      ul {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+      
+        li {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 4px;
+          padding: 5px 10px;
+          background: rgba(0,0,0,0.5);
+          list-style: none;
+          border-radius: 5px;
+        }
+      }
+    </style>
   </head>
   <body>
     <button id="open-projects-btn">Show Projects</button>
-    <button id="refresh-dirs-btn">Refresh Directories</button>
     
+    <hr>
+    
+    <h3>Base Directories</h3>
     <ul id="directories"></ul>
     <button id="add-btn">+ Add Base Directory</button>
+    <button id="refresh-dirs-btn">Load/Refresh Projects</button>
 
     <script nonce="${nonce}">
       const vscode = acquireVsCodeApi();
@@ -138,6 +185,7 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
         
         const button = document.createElement("button");
         button.textContent = "Remove";
+        button.className = "remove-btn";
         button.onclick = () => {
           vscode.postMessage({ name: "removeDirectory", data: dir });
         };
