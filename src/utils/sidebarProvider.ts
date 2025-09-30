@@ -1,10 +1,24 @@
 import * as vscode from "vscode";
 import { genNonce } from "./main";
 
-export class SidebarProvider implements vscode.WebviewViewProvider {
-  private _view?: vscode.WebviewView;
+export type GlobalStateDirs = Record<
+  string,
+  Record<
+    string,
+    {
+      languages: Record<string, number>;
+      starred: boolean;
+    }
+  >
+>;
 
-  constructor(public readonly extensionUri: vscode.Uri) {}
+export class SidebarProvider implements vscode.WebviewViewProvider {
+  public _view?: vscode.WebviewView;
+  private _context: vscode.ExtensionContext;
+
+  constructor(context: vscode.ExtensionContext) {
+    this._context = context;
+  }
 
   public resolveWebviewView(
     webviewView: vscode.WebviewView,
@@ -21,7 +35,7 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 
     this._view?.webview.onDidReceiveMessage(
       async ({ name, data }: { name: string; data: any }) => {
-        console.debug(`${name} received`);
+        console.debug(`\n========== ${name} received`, data, '\n');
         if (name === "addDirectory") {
           const result = await vscode.window.showOpenDialog({
             canSelectFiles: false,
@@ -31,14 +45,28 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
           });
 
           if (!result || result.length === 0) return;
-          // add to global state
+          const oldDirs = this._context.globalState.get<GlobalStateDirs>(
+            "dirs",
+            {}
+          );
+          this._context.globalState.update("dirs", {
+            ...oldDirs,
+            [result[0].fsPath]: {},
+          });
 
           this._view?.webview.postMessage({
             name: "directoryAdded",
             data: result[0].fsPath,
           });
         } else if (name === "removeDirectory") {
-          // remove from global state
+          const oldDirs = this._context.globalState.get<GlobalStateDirs>(
+            "dirs",
+            {}
+          );
+          await this._context.globalState.update("dirs", {
+            ...oldDirs,
+            [data]: undefined,
+          });
           this._view?.webview.postMessage({
             name: "directoryRemoved",
             data,
@@ -57,8 +85,8 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 
     setTimeout(() => {
       this._view?.webview.postMessage({
-        name: "directoriesLoaded",
-        data: ["C:\\Users\\DC\\codes"],
+        name: "globalStateLoad",
+        data: Object.keys(this._context.globalState.get("dirs", {})),
       });
     }, 50);
   }
@@ -90,13 +118,10 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
       const ul = document.getElementById("directories");
       window.addEventListener("message", ({data: {name, data}}) => {
         if (name === "directoryAdded") {
-          alert("directoryAdded received");
           addDirectoryToUI(data);
         } else if (name === "directoryRemoved") {
-          alert("directoryRemoved received");
           ul.querySelector(\`li[data-dir="\${CSS.escape(data)}"]\`)?.remove();
-        } else if (name === "directoriesLoaded") {
-          alert("directoryLoaded received");
+        } else if (name === "globalStateLoad") {
           ul.innerHTML = "";
           for (let dir of data) {
             addDirectoryToUI(dir);

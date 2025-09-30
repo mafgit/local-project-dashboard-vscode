@@ -2,11 +2,11 @@ import * as vscode from "vscode";
 import fs from "fs/promises";
 import { walkHelper } from "./walk";
 import path from "path";
+import { GlobalStateDirs } from "./sidebarProvider";
 
-let dirs: Record<string, string[]> = { "C:\\Users\\DC\\codes": [] };
 let arr: (vscode.QuickPickItem & { path: string })[] = [];
 
-export async function refreshDirectories() {
+export async function refreshDirectories(context: vscode.ExtensionContext) {
   await vscode.window.withProgress(
     {
       location: vscode.ProgressLocation.Notification,
@@ -18,31 +18,36 @@ export async function refreshDirectories() {
       progress.report({ increment: 0, message: "..." });
       arr = [];
 
+      const dirs = context.globalState.get<GlobalStateDirs>("dirs", {});
+      // todo: if no dirs, show message
+
       for (const dir of Object.keys(dirs)) {
-        const data = await fs.readdir(dir);
-        dirs[dir] = data;
+        const children = await fs.readdir(dir); // todo: check whether it is a folder or file
 
-        for (let value of data) {
-          const item = {
-            path: path.join(dir, value),
-            label: `$(folder) ${value}`,
-            detail: "",
-          };
+        for (let child of children) {
+          const itemPath = path.join(dir, child);
+          // const item = {
+          //   path: path.join(dir, value),
+          //   label: `$(folder) ${value}`,
+          //   detail: "",
+          // };
 
-          const extCount = await walkHelper(item.path, 3);
+          const extCount = await walkHelper(itemPath, 3);
 
-          const entries = Object.entries(extCount);
-          entries.sort((a, b) => b[1] - a[1]);
+          // const entries = Object.entries(extCount);
+          // entries.sort((a, b) => b[1] - a[1]);
+          // for (let [key, value] of entries) {
+          //   item.detail += `$(debug-breakpoint-data-unverified) ${value.toFixed(
+          //     1
+          //   )}% ${key.slice(1)}`;
+          // }
+          // arr.push(item);
 
-          for (let [key, value] of entries) {
-            item.detail += `$(debug-breakpoint-data-unverified) ${value.toFixed(
-              1
-            )}% ${key.slice(1)}`;
-          }
-
-          arr.push(item);
+          dirs[dir][child] = { languages: extCount, starred: false }; // todo: check if already starred
         }
       }
+
+      await context.globalState.update("dirs", dirs);
 
       progress.report({ increment: 100, message: "Done!" });
     }
@@ -67,5 +72,5 @@ export async function openProject() {
 }
 
 export const genNonce = () => {
-  return Math.ceil(Math.random() * 1234213430);
+  return Math.ceil(Math.random() * 1234213430).toString();
 };

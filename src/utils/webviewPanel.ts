@@ -1,6 +1,7 @@
 import * as vscode from "vscode";
 import path from "path";
 import { genNonce } from "./main";
+import { GlobalStateDirs } from "./sidebarProvider";
 
 export function openProjectsView(context: vscode.ExtensionContext) {
   const panel = vscode.window.createWebviewPanel(
@@ -24,20 +25,28 @@ export function openProjectsView(context: vscode.ExtensionContext) {
       .toString();
   };
 
-  panel.webview.html = getWebviewPanelHTML(panel.webview.cspSource, getUri);
+  panel.webview.html = getWebviewPanelHTML(getUri);
+
+  const dirs: GlobalStateDirs = context.globalState.get("dirs", {});
+  console.log(dirs);
+
+  if (dirs) {
+    panel.webview.postMessage({
+      name: "globalStateLoad",
+      data: dirs,
+    });
+  }
 }
 
-export function getWebviewPanelHTML(
-  cspSource: string,
-  getUri: (file: string) => any
-) {
-  const nonce = genNonce()
+export function getWebviewPanelHTML(getUri: (file: string) => any) {
+  const nonce = genNonce();
 
   return `<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${cspSource} 'unsafe-inline'; img-src ${cspSource}; script-src 'nonce-${nonce}'">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src vscode-resource:; style-src vscode-resource: 'unsafe-inline'; script-src 'nonce-${nonce}';
+">
     <title>Local Project Opener</title>
     <link rel="stylesheet" href="${getUri("styles.css")}" />
   </head>
@@ -47,93 +56,85 @@ export function getWebviewPanelHTML(
     <main id="project-sections-container">
     </main>
     <script nonce="${nonce}">
-      // const vscode = acquireVsCodeApi();
+      const vscode = acquireVsCodeApi();
 
-const data = {
-  dirs: {
-    "asd/bsd/csd": [
-      {
-        name: "Project 1",
-        languages: { ".ts": 60, ".css": 40 },
-        starred: false,
-      },
-      {
-        name: "Project 1",
-        languages: { ".ts": 60, ".css": 40 },
-        starred: true,
-      },
-    ],
-  },
-};
+      const projectSectionsContainer = document.getElementById("project-sections-container")
+      window.addEventListener("message", ({ data: { name, data } }) => {
+        console.log(name, data)
+        if (name === 'globalStateLoad') {
+          projectSectionsContainer.innerHTML = ''
+          Object.keys(data).forEach((key) => { // key = base dir
+            const section = document.createElement("section");
+            section.className = "projects-section";
+            section.dataset.dir = key;
 
-const projectSectionsContainer = document.getElementById("project-sections-container")
-projectSectionsContainer.innerHTML = ''
+            section.innerHTML = \`<p>\${key}</p>\`;
 
-Object.keys(data.dirs).forEach((key) => {
-  const section = document.createElement("section");
-  section.className = "projects-section";
-  section.dataset.dir = key;
+            const projects = document.createElement('div')
+            projects.className = 'projects'
 
-  section.innerHTML = \`<p>\${CSS.escape(key)}</p>\`;
+            Object.keys(data[key]).forEach((projectKey) => { // projectKey = project name
+              const article = document.createElement("article");
+              const project = data[key][projectKey]
+              article.className = "project";
+              article.dataset.dir = projectKey;
+              article.innerHTML = \`
+                <div class="project-head">
+                  <div class="project-head-heading">
+                    <img src="${getUri(
+                      "folder-solid-full.svg"
+                    )}" width="20" alt="folder" />
+                    <h3></h3>
+                  </div>
 
-  const projects = document.createElement('div')
-  projects.className = 'projects'
+                  <div class="project-btns">
+                    <button class="project-edit-btn">
+                      <img src="${getUri(
+                        "pencil-solid-full.svg"
+                      )}" alt="edit" />
+                    </button>
+                    <button class="project-star-btn">
+                      <img src="${getUri("star-solid-full.svg")}" alt="star" />
+                    </button>
+                  </div>
+                </div>
 
-  data.dirs[key].forEach((project) => {
-    const article = document.createElement("article");
-    article.className = "project";
-    article.dataset.dir = project.name;
-    article.innerHTML = \`
-      <div class="project-head">
-        <div class="project-head-heading">
-          <img src="${getUri('folder-solid-full.svg')}" width="20" alt="folder" />
-          <h3></h3>
-        </div>
+                <div class="languages"></div>
 
-        <div class="project-btns">
-          <button class="project-edit-btn">
-            <img src="${getUri('pencil-solid-full.svg')}" alt="edit" />
-          </button>
-          <button class="project-star-btn">
-            <img src="${getUri('star-solid-full.svg')}" alt="star" />
-          </button>
-        </div>
-      </div>
+                <div class="project-bottom">
+                  <button class="open-btn">Open</button>
+                </div>
+              \`;
 
-      <div class="languages"></div>
+              article.querySelector("h3").textContent = projectKey;
 
-      <div class="project-bottom">
-        <button class="open-btn">Open</button>
-      </div>
-    \`;
+              const languages = article.querySelector(".languages");
+              Object.keys(project.languages).forEach((lang) => {
+                languages.innerHTML += \`
+                  <div class="language">
+                    <div class="language-icon \${lang.slice(1)}"></div>
+                    <p>\${project.languages[lang].toFixed(1)}% \${lang.slice(1)}</p>
+                  </div>\`;
+              });
 
-    article.querySelector("h3").textContent = project.name;
-
-    const languages = article.querySelector(".languages");
-    Object.keys(project.languages).forEach((lang) => {
-      languages.innerHTML += \`
-        <div class="language">
-          <div class="language-icon"></div>
-          <p>\${project.languages[lang]}% \${lang}</p>
-        </div>\`;
-    });
-
-    // todo: star
-    // todo: edit name
+              // todo: star
+              // todo: edit name
 
 
-    article.querySelector(".open-btn").onclick = () => {
-      vscode.postMessage({ name: "openProject", data: [key, project.name] });
-    };
+              article.querySelector(".open-btn").onclick = () => {
+                vscode.postMessage({ name: "openProject", data: [key, projectKey] });
+              };
 
-    projects.appendChild(article)
-    section.appendChild(projects)
-    
-  });
+              projects.appendChild(article)
+              section.appendChild(projects)
+              
+            });
 
-  projectSectionsContainer.appendChild(section);
-});
-
+            projectSectionsContainer.appendChild(section);
+          });
+        }
+      })
+      
     </script>
   </body>
 </html>

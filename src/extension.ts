@@ -13,7 +13,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
   const disposable2 = vscode.commands.registerCommand(
     "local-project-opener.refreshDirectories",
-    refreshDirectories
+    () => refreshDirectories(context)
   );
 
   const disposable3 = vscode.commands.registerCommand(
@@ -23,10 +23,15 @@ export async function activate(context: vscode.ExtensionContext) {
 
   const disposable4 = vscode.window.registerWebviewViewProvider(
     "sidebarView",
-    new SidebarProvider(context.extensionUri)
+    new SidebarProvider(context)
   );
 
-  context.subscriptions.push(disposable1, disposable2, disposable3, disposable4);
+  context.subscriptions.push(
+    disposable1,
+    disposable2,
+    disposable3,
+    disposable4
+  );
 }
 
 export function deactivate() {}

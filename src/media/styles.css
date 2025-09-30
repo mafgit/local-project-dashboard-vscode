@@ -6,12 +6,16 @@
 
 body {
   font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
-  background: #1c1c1c;
+  background: rgb(24, 24, 24);
   padding: 30px;
   display: flex;
   gap: 30px;
   flex-direction: column;
   color: #f1f1f1;
+}
+
+h1 {
+  text-align: center;
 }
 
 button,
@@ -32,14 +36,32 @@ button {
     filter: brightness(90%);
   }
 }
+ 
+#project-sections-container {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+
+  .projects-section {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+
+    & > p {
+      color: #cacaca;
+      font-style: italic;
+      font-size: 1.1em;
+    }
+  }
+}
 
 .projects {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr;
   gap: 10px;
 
   .project {
-    background: #444444;
+    background: linear-gradient(#292431, #242931);
     border-radius: 10px;
     gap: 8px;
     display: flex;
@@ -77,6 +99,7 @@ button {
 
     .languages {
       display: flex;
+      flex-wrap: wrap;
       gap: 8px;
 
       .language {
@@ -90,8 +113,41 @@ button {
           width: 8px;
           display: flex;
           height: 8px;
-          background: blue;
+          background: rgb(252, 252, 252);
           border-radius: 10px;
+
+          &.html,
+          &.xml {
+            background: red;
+          }
+
+          &.css,
+          &.scss,
+          &.sass {
+            background: rgb(24, 182, 255);
+          }
+
+          &.js,
+          &.jsx {
+            background: yellow;
+          }
+
+          &.ts,
+          &.tsx {
+            background: #0026ff;
+          }
+
+          &.py {
+            background: #4781ff;
+          }
+
+          &.cpp {
+            background: #e415ff;
+          }
+
+          &.c {
+            background: #ff15c4;
+          }
         }
       }
     }
@@ -101,12 +157,25 @@ button {
 .project-bottom {
   width: 100%;
   display: flex;
+  margin-top: auto;
 
   .open-btn {
-    background: blue;
+    background: rgba(95, 151, 255, 0.486);
     color: #f1f1f1;
     padding: 5px 10px;
     margin-left: auto;
     border-radius: 8px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .projects {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media screen and (max-width: 400px) {
+  .projects {
+    grid-template-columns: 1fr;
   }
 }
