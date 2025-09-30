@@ -9,7 +9,9 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "onView:sidebarView"
+  ],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
@@ -29,18 +31,19 @@
     "viewsContainers": {
       "activitybar": [
         {
-          "icon": "media/assets/icon.svg",
-          "id": "local-project-opener-view",
-          "title": "Local Project Opener"
+          "id": "sidebarViewContainer",
+          "title": "Local Project Opener",
+          "icon": "$(folder)"
         }
       ]
     },
     "views": {
-      "localProjectOpener": [
+      "sidebarViewContainer": [
         {
-          "id": "local-project-opener-view",
+          "type": "webview",
+          "id": "sidebarView",
           "name": "Local Project Opener",
-          "icon": "media/assets/icon.svg"
+          "icon": "$(folder)"
         }
       ]
     }
