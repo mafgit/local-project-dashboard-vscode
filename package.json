@@ -1,12 +1,20 @@
 {
   "name": "localhub",
-  "displayName": "LocalHub",
-  "description": "Open projects in a new tab without having to find folders in explorer",
+  "displayName": "LocalHub: Project Explorer",
+  "keywords": [
+    "project",
+    "explorer",
+    "viewer",
+    "opener",
+    "localhub"
+  ],
+  "description": "View all projects in one place & open any project in a new tab without having to open it from explorer",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.104.0"
   },
   "categories": [
+    "Visualization",
     "Other"
   ],
   "activationEvents": [
@@ -17,15 +25,15 @@
     "commands": [
       {
         "command": "localhub.openProject",
-        "title": "LocalHub: Open A Project In New Window"
+        "title": "Open A Project In New Window"
       },
       {
-        "command": "localhub.refreshDirectories",
-        "title": "LocalHub: Refresh Directories"
+        "command": "localhub.refreshProjects",
+        "title": "Refresh Projects"
       },
       {
         "command": "localhub.showProjectsPanel",
-        "title": "LocalHub: Open Projects View"
+        "title": "Show Projects"
       }
     ],
     "viewsContainers": {

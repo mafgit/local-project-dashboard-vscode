@@ -75,9 +75,9 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
           await vscode.commands.executeCommand(
             "localhub.showProjectsPanel"
           );
-        } else if (name === "refreshDirectories") {
+        } else if (name === "refreshProjects") {
           await vscode.commands.executeCommand(
-            "localhub.refreshDirectories"
+            "localhub.refreshProjects"
           );
         }
       }
@@ -256,7 +256,7 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
       }
 
       document.getElementById("refresh-btn").onclick = () => {
-        vscode.postMessage({ name: "refreshDirectories" })
+        vscode.postMessage({ name: "refreshProjects" })
       }
     </script>
   </body>

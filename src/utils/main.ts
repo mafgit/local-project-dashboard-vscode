@@ -6,7 +6,7 @@ import { GlobalStateDirs } from "./sidebarProvider";
 
 let arr: (vscode.QuickPickItem & { path: string })[] = [];
 
-export async function refreshDirectories(context: vscode.ExtensionContext) {
+export async function refreshProjects(context: vscode.ExtensionContext) {
   await vscode.window.withProgress(
     {
       location: vscode.ProgressLocation.Notification,

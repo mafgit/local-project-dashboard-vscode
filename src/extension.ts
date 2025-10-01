@@ -1,10 +1,10 @@
 import * as vscode from "vscode";
-import { openProject, refreshDirectories } from "./utils/main";
+import { openProject, refreshProjects } from "./utils/main";
 import { showProjectsPanel } from "./utils/webviewPanel";
 import { SidebarProvider } from "./utils/sidebarProvider";
 
 export async function activate(context: vscode.ExtensionContext) {
-  console.log("Welcome to LocalHub!");
+  console.log("Welcome to LocalHub: Project Explorer!");
 
   const disposable1 = vscode.commands.registerCommand(
     "localhub.openProject",
@@ -12,8 +12,8 @@ export async function activate(context: vscode.ExtensionContext) {
   );
 
   const disposable2 = vscode.commands.registerCommand(
-    "localhub.refreshDirectories",
-    () => refreshDirectories(context)
+    "localhub.refreshProjects",
+    () => refreshProjects(context)
   );
 
   const disposable3 = vscode.commands.registerCommand(
@@ -30,7 +30,7 @@ export async function activate(context: vscode.ExtensionContext) {
     disposable1,
     disposable2,
     disposable3,
-    disposable4
+    disposable4,
   );
 }
 
