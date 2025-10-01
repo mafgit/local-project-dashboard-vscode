@@ -1,5 +1,6 @@
 import * as vscode from "vscode";
 import { genNonce } from "./main";
+import { panel } from "./panel";
 
 export type GlobalStateDirs = Record<
   string,
@@ -13,7 +14,7 @@ export type GlobalStateDirs = Record<
 >;
 
 export class SidebarProvider implements vscode.WebviewViewProvider {
-  public _view?: vscode.WebviewView;
+  public view?: vscode.WebviewView;
   private _context: vscode.ExtensionContext;
 
   constructor(context: vscode.ExtensionContext) {
@@ -25,7 +26,7 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
     context: vscode.WebviewViewResolveContext,
     token: vscode.CancellationToken
   ): Thenable<void> | void {
-    this._view = webviewView;
+    this.view = webviewView;
 
     webviewView.webview.options = {
       enableScripts: true,
@@ -33,9 +34,23 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 
     webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
 
-    this._view?.webview.onDidReceiveMessage(
+    this.view?.webview.postMessage({
+      name: "globalStateLoad",
+      data: Object.keys(this._context.globalState.get("dirs", {})),
+    });
+
+    this.view?.onDidChangeVisibility(() => {
+      if (this.view?.visible) {
+        this.view?.webview.postMessage({
+          name: "globalStateLoad",
+          data: Object.keys(this._context.globalState.get("dirs", {})),
+        });
+      }
+    });
+
+    this.view?.webview.onDidReceiveMessage(
       async ({ name, data }: { name: string; data: any }) => {
-        console.debug(`\n========== ${name} received`, data, '\n');
+        console.debug(`\n========== ${name} received`, data, "\n");
         if (name === "addDirectory") {
           const result = await vscode.window.showOpenDialog({
             canSelectFiles: false,
@@ -54,7 +69,7 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
             [result[0].fsPath]: {},
           });
 
-          this._view?.webview.postMessage({
+          this.view?.webview.postMessage({
             name: "directoryAdded",
             data: result[0].fsPath,
           });
@@ -67,28 +82,21 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
             ...oldDirs,
             [data]: undefined,
           });
-          this._view?.webview.postMessage({
+          this.view?.webview.postMessage({
             name: "directoryRemoved",
             data,
           });
         } else if (name === "showProjects") {
-          await vscode.commands.executeCommand(
-            "localhub.showProjectsPanel"
-          );
+          await vscode.commands.executeCommand("localhub.showProjectsPanel");
         } else if (name === "refreshProjects") {
-          await vscode.commands.executeCommand(
-            "localhub.refreshProjects"
-          );
+          await vscode.commands.executeCommand("localhub.refreshProjects");
+          panel?.webview.postMessage({
+            name: "globalStateLoad",
+            data: this._context.globalState.get("dirs", {}),
+          });
         }
       }
     );
-
-    setTimeout(() => {
-      this._view?.webview.postMessage({
-        name: "globalStateLoad",
-        data: Object.keys(this._context.globalState.get("dirs", {})),
-      });
-    }, 50);
   }
 
   private _getHtmlForWebview(webview: vscode.Webview) {
@@ -114,6 +122,10 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
         color: white;
         border-radius: 5px;
         width: 100%;
+        display: flex;
+        justify-content: center;
+        gap: 4px;
+        align-items: center;
         outline: none;
         border: none;
 
@@ -129,15 +141,16 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
         }
 
         &#add-btn {
-          background: #00c92bb6;
-        }
-
-        &#refresh-btn {
           background: #006dc7ff;
+        }
+          
+        &#refresh-btn {
+          background: #00c92bb6;
         }
 
         &#show-projects-btn {
           padding: 10px;
+          gap: 10px;
           background: linear-gradient(45deg, #9600dbff, #0079dbff);
         }
       }
@@ -145,7 +158,7 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
       hr {
         border: none;
         border-top: 1px solid rgba(255,255,255,0.3);
-        margin: 5px 5px;
+        margin: 8px 5px;
         border-radius: 5px;
         width: 95%;
       }
@@ -190,6 +203,7 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
         flex-wrap: wrap;
 
         button {
+          height: 30px;
           flex: 1;
         }
       }
@@ -198,7 +212,7 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
   <body>
     <h3 style="font-weight: bold;">LocalHub</h3>
     <p>View all your local projects in one place</p>
-    <button id="show-projects-btn">Show Projects</button>
+    <button id="show-projects-btn"><svg width="14" height="14" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--!Font Awesome Free v7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path fill="white" d="M88 96c22.1 0 40 17.9 40 40l0 48c0 22.1-17.9 40-40 40l-48 0c-22.1 0-40-17.9-40-40l0-48c0-22.1 17.9-40 40-40l48 0zM280 224l-48 0c-22.1 0-40-17.9-40-40l0-48c0-22.1 17.9-40 40-40l48 0c22.1 0 40 17.9 40 40l0 48c0 22.1-17.9 40-40 40zm192 0l-48 0c-22.1 0-40-17.9-40-40l0-48c0-22.1 17.9-40 40-40l48 0c22.1 0 40 17.9 40 40l0 48c0 22.1-17.9 40-40 40zm0 192l-48 0c-22.1 0-40-17.9-40-40l0-48c0-22.1 17.9-40 40-40l48 0c22.1 0 40 17.9 40 40l0 48c0 22.1-17.9 40-40 40zM280 288c22.1 0 40 17.9 40 40l0 48c0 22.1-17.9 40-40 40l-48 0c-22.1 0-40-17.9-40-40l0-48c0-22.1 17.9-40 40-40l48 0zM88 416l-48 0c-22.1 0-40-17.9-40-40l0-48c0-22.1 17.9-40 40-40l48 0c22.1 0 40 17.9 40 40l0 48c0 22.1-17.9 40-40 40z"/></svg> <span>Show Projects</span></button>
     
     <hr>
     
@@ -206,8 +220,11 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
     <p>Add a directory and load projects from it</p>
     <ul id="directories"></ul>
     <div class="two-btns">
-      <button id="add-btn">+ Add</button>
-      <button id="refresh-btn">Load/Refresh</button>
+      <button id="add-btn"><svg width="18" height="18" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"><!--!Font Awesome Free v7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path fill="white" d="M576 448C576 483.3 547.3 512 512 512L128 512C92.7 512 64 483.3 64 448L64 160C64 124.7 92.7 96 128 96L266.7 96C280.5 96 294 100.5 305.1 108.8L343.5 137.6C349 141.8 355.8 144 362.7 144L512 144C547.3 144 576 172.7 576 208L576 448zM320 224C306.7 224 296 234.7 296 248L296 296L248 296C234.7 296 224 306.7 224 320C224 333.3 234.7 344 248 344L296 344L296 392C296 405.3 306.7 416 320 416C333.3 416 344 405.3 344 392L344 344L392 344C405.3 344 416 333.3 416 320C416 306.7 405.3 296 392 296L344 296L344 248C344 234.7 333.3 224 320 224z"/></svg><span>Add</span></button>
+      <button id="refresh-btn">
+        <svg width="14" height="14" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--!Font Awesome Free v7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path fill="white" d="M208 48a48 48 0 1 1 96 0 48 48 0 1 1 -96 0zm0 416a48 48 0 1 1 96 0 48 48 0 1 1 -96 0zM48 208a48 48 0 1 1 0 96 48 48 0 1 1 0-96zm368 48a48 48 0 1 1 96 0 48 48 0 1 1 -96 0zM75 369.1A48 48 0 1 1 142.9 437 48 48 0 1 1 75 369.1zM75 75A48 48 0 1 1 142.9 142.9 48 48 0 1 1 75 75zM437 369.1A48 48 0 1 1 369.1 437 48 48 0 1 1 437 369.1z"/></svg>
+        <span>Scan/Refresh</span>
+      </button>
     </div>
 
     <script nonce="${nonce}">

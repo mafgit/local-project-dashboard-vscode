@@ -1,27 +1,23 @@
 import * as vscode from "vscode";
 import path from "path";
 import { genNonce } from "./main";
-import { GlobalStateDirs } from "./sidebarProvider";
+import { GlobalStateDirs } from "./sidebar";
 
-export function updatePanelUI(context: vscode.ExtensionContext, panel: vscode.WebviewPanel) {
-  const dirs: GlobalStateDirs = context.globalState.get("dirs", {});
-  console.log(dirs);
-
-  if (dirs) {
-    panel.webview.postMessage({
-      name: "globalStateLoad",
-      data: dirs,
-    });
-  }
-}
+export let panel: vscode.WebviewPanel | undefined;
+let panelDisposed = false;
 
 export function showProjectsPanel(context: vscode.ExtensionContext) {
-  const panel = vscode.window.createWebviewPanel(
+  if (panel && !panelDisposed) {
+    panel.reveal();
+    return;
+  }
+
+  panel = vscode.window.createWebviewPanel(
     "localProjectOpenerWebview",
     "LocalHub: Project Explorer",
     vscode.ViewColumn.One,
     {
-      retainContextWhenHidden: false,
+      retainContextWhenHidden: true,
       enableScripts: true,
       // localResourceRoots: [
       //   vscode.Uri.file(path.join(context.extensionPath, "media")),
@@ -31,13 +27,17 @@ export function showProjectsPanel(context: vscode.ExtensionContext) {
 
   panel.iconPath = vscode.Uri.joinPath(
     context.extensionUri,
-    "src",
     "media",
     "icon.svg"
   );
 
+  panel.onDidDispose(() => {
+    panelDisposed = true;
+    panel = undefined;
+  });
+  
   const getUri = (file: string) => {
-    return panel.webview
+    return panel?.webview
       .asWebviewUri(
         vscode.Uri.file(path.join(context.extensionPath, "media", file))
       )
@@ -46,7 +46,15 @@ export function showProjectsPanel(context: vscode.ExtensionContext) {
 
   panel.webview.html = getWebviewPanelHTML(getUri);
 
-  updatePanelUI(context, panel);
+
+  const dirs: GlobalStateDirs = context.globalState.get("dirs", {});
+
+  if (dirs) {
+    panel.webview.postMessage({
+      name: "globalStateLoad",
+      data: dirs,
+    });
+  }
 
   // receive message
   panel.webview.onDidReceiveMessage(
@@ -77,7 +85,7 @@ export function getWebviewPanelHTML(getUri: (file: string) => any) {
     <link rel="stylesheet" href="${getUri("styles.css")}" />
   </head>
   <body>
-    <h1>LocalHub</h1>
+    <h1>👋 Hello Coder. Welcome to LocalHub!</h1>
 
     <p class="msg-1">No project found. From sidebar, add directory wherein your projects live directly, then click load.</p>
 
@@ -110,7 +118,7 @@ export function getWebviewPanelHTML(getUri: (file: string) => any) {
 
             const projectNames = Object.keys(data[key])
             if (projectNames.length === 0) {
-              section.innerHTML += \`<p class="msg-2">No project found here. You might have forgotten to load/refresh from sidebar after adding it.</p>\`;
+              section.innerHTML += \`<p class="msg-2">No project found yet. Click "Scan" from sidebar after adding a directory.</p>\`;
             }
             projectNames.forEach((projectKey) => { // projectKey = project name
               const article = document.createElement("article");

@@ -2,7 +2,7 @@ import * as vscode from "vscode";
 import fs from "fs/promises";
 import { walkHelper } from "./walk";
 import path from "path";
-import { GlobalStateDirs } from "./sidebarProvider";
+import { GlobalStateDirs } from "./sidebar";
 
 let arr: (vscode.QuickPickItem & { path: string })[] = [];
 
