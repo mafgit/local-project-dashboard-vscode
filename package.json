@@ -40,7 +40,7 @@
       "activitybar": [
         {
           "id": "sidebarViewContainer",
-          "title": "LocalHub",
+          "title": "LocalHub: Project Explorer",
           "icon": "media/icon.svg"
         }
       ]
@@ -50,7 +50,7 @@
         {
           "type": "webview",
           "id": "sidebarView",
-          "name": "LocalHub",
+          "name": "LocalHub: Project Explorer",
           "icon": "media/icon.svg"
         }
       ]

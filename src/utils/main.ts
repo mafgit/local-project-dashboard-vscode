@@ -32,7 +32,7 @@ export async function refreshProjects(context: vscode.ExtensionContext) {
           //   detail: "",
           // };
 
-          const extCount = await walkHelper(itemPath, 3);
+          const extCount = await walkHelper(itemPath, 4);
 
           // const entries = Object.entries(extCount);
           // entries.sort((a, b) => b[1] - a[1]);

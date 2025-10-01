@@ -137,7 +137,8 @@ button {
           }
 
           &.js,
-          &.jsx {
+          &.jsx,
+          &.mjs {
             background: yellow;
           }
 

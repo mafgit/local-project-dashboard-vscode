@@ -3,10 +3,22 @@ import path from "path";
 import { genNonce } from "./main";
 import { GlobalStateDirs } from "./sidebarProvider";
 
+export function updatePanelUI(context: vscode.ExtensionContext, panel: vscode.WebviewPanel) {
+  const dirs: GlobalStateDirs = context.globalState.get("dirs", {});
+  console.log(dirs);
+
+  if (dirs) {
+    panel.webview.postMessage({
+      name: "globalStateLoad",
+      data: dirs,
+    });
+  }
+}
+
 export function showProjectsPanel(context: vscode.ExtensionContext) {
   const panel = vscode.window.createWebviewPanel(
     "localProjectOpenerWebview",
-    "LocalHub",
+    "LocalHub: Project Explorer",
     vscode.ViewColumn.One,
     {
       retainContextWhenHidden: false,
@@ -34,15 +46,7 @@ export function showProjectsPanel(context: vscode.ExtensionContext) {
 
   panel.webview.html = getWebviewPanelHTML(getUri);
 
-  const dirs: GlobalStateDirs = context.globalState.get("dirs", {});
-  console.log(dirs);
-
-  if (dirs) {
-    panel.webview.postMessage({
-      name: "globalStateLoad",
-      data: dirs,
-    });
-  }
+  updatePanelUI(context, panel);
 
   // receive message
   panel.webview.onDidReceiveMessage(
@@ -69,7 +73,7 @@ export function getWebviewPanelHTML(getUri: (file: string) => any) {
     <meta charset="UTF-8" />
     <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src vscode-resource:; style-src vscode-resource: 'unsafe-inline'; script-src 'nonce-${nonce}';
 ">
-    <title>LocalHub</title>
+    <title>LocalHub: Project Explorer</title>
     <link rel="stylesheet" href="${getUri("styles.css")}" />
   </head>
   <body>
@@ -144,13 +148,17 @@ export function getWebviewPanelHTML(getUri: (file: string) => any) {
               article.querySelector("h3").textContent = projectKey;
 
               const languages = article.querySelector(".languages");
-              Object.keys(project.languages).forEach((lang) => {
+
+
+              const entries = Object.entries(project.languages);
+              entries.sort((a, b) => b[1] - a[1]);
+              for (let [key, value] of entries) {
                 languages.innerHTML += \`
                   <div class="language">
-                    <div class="language-icon \${lang.slice(1)}"></div>
-                    <p>\${project.languages[lang].toFixed(1)}% \${lang.slice(1)}</p>
+                  <div class="language-icon \${key.slice(1)}"></div>
+                  <p>\${value.toFixed(1)}% \${key.slice(1)}</p>
                   </div>\`;
-              });
+                }
 
               // todo: star
               // todo: edit name
