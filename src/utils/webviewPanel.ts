@@ -3,24 +3,31 @@ import path from "path";
 import { genNonce } from "./main";
 import { GlobalStateDirs } from "./sidebarProvider";
 
-export function openProjectsView(context: vscode.ExtensionContext) {
+export function showProjectsPanel(context: vscode.ExtensionContext) {
   const panel = vscode.window.createWebviewPanel(
     "localProjectOpenerWebview",
-    "Local Project Opener",
+    "LocalHub",
     vscode.ViewColumn.One,
     {
       retainContextWhenHidden: false,
       enableScripts: true,
       // localResourceRoots: [
-      //   vscode.Uri.file(path.join(context.extensionPath, "src", "media")),
+      //   vscode.Uri.file(path.join(context.extensionPath, "media")),
       // ],
     }
+  );
+
+  panel.iconPath = vscode.Uri.joinPath(
+    context.extensionUri,
+    "src",
+    "media",
+    "icon.svg"
   );
 
   const getUri = (file: string) => {
     return panel.webview
       .asWebviewUri(
-        vscode.Uri.file(path.join(context.extensionPath, "src", "media", file))
+        vscode.Uri.file(path.join(context.extensionPath, "media", file))
       )
       .toString();
   };
@@ -36,6 +43,21 @@ export function openProjectsView(context: vscode.ExtensionContext) {
       data: dirs,
     });
   }
+
+  // receive message
+  panel.webview.onDidReceiveMessage(
+    async ({ name, data }: { name: string; data: any }) => {
+      if (name === "openProject") {
+        await vscode.commands.executeCommand(
+          "vscode.openFolder",
+          vscode.Uri.file(path.join(...data)),
+          {
+            forceNewWindow: true,
+          }
+        );
+      }
+    }
+  );
 }
 
 export function getWebviewPanelHTML(getUri: (file: string) => any) {
@@ -47,11 +69,13 @@ export function getWebviewPanelHTML(getUri: (file: string) => any) {
     <meta charset="UTF-8" />
     <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src vscode-resource:; style-src vscode-resource: 'unsafe-inline'; script-src 'nonce-${nonce}';
 ">
-    <title>Local Project Opener</title>
+    <title>LocalHub</title>
     <link rel="stylesheet" href="${getUri("styles.css")}" />
   </head>
   <body>
-    <h1>Local Project Opener</h1>
+    <h1>LocalHub</h1>
+
+    <p class="msg-1">No project found. From sidebar, add directory wherein your projects live directly, then click load.</p>
 
     <main id="project-sections-container">
     </main>
@@ -63,17 +87,28 @@ export function getWebviewPanelHTML(getUri: (file: string) => any) {
         console.log(name, data)
         if (name === 'globalStateLoad') {
           projectSectionsContainer.innerHTML = ''
-          Object.keys(data).forEach((key) => { // key = base dir
+          const baseDirs = Object.keys(data)
+          if (baseDirs.length === 0) {
+            document.querySelector('.msg-1').style.display = 'block';
+            return;
+          } else {
+            document.querySelector('.msg-1').style.display = 'none';
+          }
+          baseDirs.forEach((key) => { // key = base dir
             const section = document.createElement("section");
             section.className = "projects-section";
             section.dataset.dir = key;
 
-            section.innerHTML = \`<p>\${key}</p>\`;
+            section.innerHTML = \`<h2 class="section-heading">\${key}</h2>\`;
 
             const projects = document.createElement('div')
             projects.className = 'projects'
 
-            Object.keys(data[key]).forEach((projectKey) => { // projectKey = project name
+            const projectNames = Object.keys(data[key])
+            if (projectNames.length === 0) {
+              section.innerHTML += \`<p class="msg-2">No project found here. You might have forgotten to load/refresh from sidebar after adding it.</p>\`;
+            }
+            projectNames.forEach((projectKey) => { // projectKey = project name
               const article = document.createElement("article");
               const project = data[key][projectKey]
               article.className = "project";
@@ -88,11 +123,11 @@ export function getWebviewPanelHTML(getUri: (file: string) => any) {
                   </div>
 
                   <div class="project-btns">
-                    <button class="project-edit-btn">
+                    <!-- <button class="project-edit-btn">
                       <img src="${getUri(
                         "pencil-solid-full.svg"
                       )}" alt="edit" />
-                    </button>
+                    </button> -->
                     <button class="project-star-btn">
                       <img src="${getUri("star-solid-full.svg")}" alt="star" />
                     </button>

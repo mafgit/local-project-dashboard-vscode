@@ -1,6 +1,6 @@
 {
-  "name": "local-project-opener",
-  "displayName": "Local Project Opener",
+  "name": "localhub",
+  "displayName": "LocalHub",
   "description": "Open projects in a new tab without having to find folders in explorer",
   "version": "0.0.1",
   "engines": {
@@ -16,24 +16,24 @@
   "contributes": {
     "commands": [
       {
-        "command": "local-project-opener.openProject",
-        "title": "Local Project Opener: Open A Project In New Window"
+        "command": "localhub.openProject",
+        "title": "LocalHub: Open A Project In New Window"
       },
       {
-        "command": "local-project-opener.refreshDirectories",
-        "title": "Local Project Opener: Refresh Directories"
+        "command": "localhub.refreshDirectories",
+        "title": "LocalHub: Refresh Directories"
       },
       {
-        "command": "local-project-opener.openProjectsView",
-        "title": "Local Project Opener: Open Projects View"
+        "command": "localhub.showProjectsPanel",
+        "title": "LocalHub: Open Projects View"
       }
     ],
     "viewsContainers": {
       "activitybar": [
         {
           "id": "sidebarViewContainer",
-          "title": "Local Project Opener",
-          "icon": "$(folder)"
+          "title": "LocalHub",
+          "icon": "media/icon.svg"
         }
       ]
     },
@@ -42,8 +42,8 @@
         {
           "type": "webview",
           "id": "sidebarView",
-          "name": "Local Project Opener",
-          "icon": "$(folder)"
+          "name": "LocalHub",
+          "icon": "media/icon.svg"
         }
       ]
     }

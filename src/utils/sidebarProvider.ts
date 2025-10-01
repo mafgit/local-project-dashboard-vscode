@@ -73,11 +73,11 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
           });
         } else if (name === "showProjects") {
           await vscode.commands.executeCommand(
-            "local-project-opener.openProjectsView"
+            "localhub.showProjectsPanel"
           );
         } else if (name === "refreshDirectories") {
           await vscode.commands.executeCommand(
-            "local-project-opener.refreshDirectories"
+            "localhub.refreshDirectories"
           );
         }
       }
@@ -99,14 +99,18 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
   <head>
     <meta charset="UTF-8" />
     <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'nonce-${nonce}'; style-src vscode-resource: 'unsafe-inline'">
-    <title>Local Project Opener</title>
+    <title>LocalHub</title>
     <style nonce="${nonce}">
       * {margin: 0; padding: 0; box-sizing: border-box;}
 
+    
+      button:hover {
+        filter: brightness(90%);
+      }
+      
       button {
         cursor: pointer;
-        background: #1553ffff;
-        padding: 10px 10px;
+        padding: 8px;
         color: white;
         border-radius: 5px;
         width: 100%;
@@ -114,10 +118,36 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
         border: none;
 
         &.remove-btn {
-          font-size: 12px !important;
-          padding: 5px !important;
-          width: max-content !important;
+          font-size: 18px;
+          width: 20px;
+          height: 20px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          background-color: #ff1e0077;
+          width: max-content;
         }
+
+        &#add-btn {
+          background: #00c92bb6;
+        }
+
+        &#refresh-btn {
+          background: #006dc7ff;
+        }
+
+        &#show-projects-btn {
+          padding: 10px;
+          background: linear-gradient(45deg, #9600dbff, #0079dbff);
+        }
+      }
+
+      hr {
+        border: none;
+        border-top: 1px solid rgba(255,255,255,0.3);
+        margin: 5px 5px;
+        border-radius: 5px;
+        width: 95%;
       }
 
       body {
@@ -125,35 +155,60 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
         flex-direction: column;
         gap: 10px;
         padding: 10px;
+        align-items: center;
       }
 
       ul {
         display: flex;
         flex-direction: column;
         gap: 5px;
+        width: 100%;
       
         li {
           display: flex;
           justify-content: space-between;
           align-items: center;
           gap: 4px;
-          padding: 5px 10px;
+          padding: 8px 5px;
           background: rgba(0,0,0,0.5);
           list-style: none;
           border-radius: 5px;
+          width: 100%;
+        }
+      }
+
+      h3, h4 {
+        font-weight: normal;
+      }
+
+      .two-btns {
+        display: flex;
+        gap:4px;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        flex-wrap: wrap;
+
+        button {
+          flex: 1;
         }
       }
     </style>
   </head>
   <body>
-    <button id="open-projects-btn">Show Projects</button>
+    <h3 style="font-weight: bold;">LocalHub</h3>
+    <p>View all your local projects in one place</p>
+    <button id="show-projects-btn">Show Projects</button>
     
     <hr>
     
-    <h3>Base Directories</h3>
+    <h4>Base Directories</h4>
+    <p>Add a directory and load projects from it</p>
     <ul id="directories"></ul>
-    <button id="add-btn">+ Add Base Directory</button>
-    <button id="refresh-dirs-btn">Load/Refresh Projects</button>
+    <div class="two-btns">
+      <button id="add-btn">+ Add</button>
+      <button id="refresh-btn">Load/Refresh</button>
+    </div>
 
     <script nonce="${nonce}">
       const vscode = acquireVsCodeApi();
@@ -184,7 +239,7 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
         p.textContent = dir;
         
         const button = document.createElement("button");
-        button.textContent = "Remove";
+        button.textContent = "-";
         button.className = "remove-btn";
         button.onclick = () => {
           vscode.postMessage({ name: "removeDirectory", data: dir });
@@ -196,11 +251,11 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
       }
 
       // -----------------------
-      document.getElementById("open-projects-btn").onclick = () => {
+      document.getElementById("show-projects-btn").onclick = () => {
         vscode.postMessage({ name: "showProjects" })
       }
 
-      document.getElementById("refresh-dirs-btn").onclick = () => {
+      document.getElementById("refresh-btn").onclick = () => {
         vscode.postMessage({ name: "refreshDirectories" })
       }
     </script>

@@ -1,24 +1,24 @@
 import * as vscode from "vscode";
 import { openProject, refreshDirectories } from "./utils/main";
-import { openProjectsView } from "./utils/webviewPanel";
+import { showProjectsPanel } from "./utils/webviewPanel";
 import { SidebarProvider } from "./utils/sidebarProvider";
 
 export async function activate(context: vscode.ExtensionContext) {
-  console.log("Welcome to Local Project Opener!");
+  console.log("Welcome to LocalHub!");
 
   const disposable1 = vscode.commands.registerCommand(
-    "local-project-opener.openProject",
+    "localhub.openProject",
     openProject
   );
 
   const disposable2 = vscode.commands.registerCommand(
-    "local-project-opener.refreshDirectories",
+    "localhub.refreshDirectories",
     () => refreshDirectories(context)
   );
 
   const disposable3 = vscode.commands.registerCommand(
-    "local-project-opener.openProjectsView",
-    () => openProjectsView(context)
+    "localhub.showProjectsPanel",
+    () => showProjectsPanel(context)
   );
 
   const disposable4 = vscode.window.registerWebviewViewProvider(
