@@ -41,7 +41,7 @@
         {
           "id": "sidebarViewContainer",
           "title": "LocalHub: Project Explorer",
-          "icon": "media/icon.svg"
+          "icon": "media/icon.png"
         }
       ]
     },
@@ -51,7 +51,7 @@
           "type": "webview",
           "id": "sidebarView",
           "name": "LocalHub: Project Explorer",
-          "icon": "media/icon.svg"
+          "icon": "media/icon.png"
         }
       ]
     }

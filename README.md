@@ -1,6 +1,6 @@
-# my-ext-id README
+# localhub README
 
-This is the README for your extension "my-ext-id". After writing up a brief description, we recommend including the following sections.
+This is the README for your extension "localhub". After writing up a brief description, we recommend including the following sections.
 
 ## Features
 

@@ -19,7 +19,6 @@ export async function refreshProjects(context: vscode.ExtensionContext) {
       arr = [];
 
       const dirs = context.globalState.get<GlobalStateDirs>("dirs", {});
-      // todo: if no dirs, show message
 
       for (const dir of Object.keys(dirs)) {
         const children = await fs.readdir(dir); // todo: check whether it is a folder or file

@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { openProject, refreshProjects } from "./utils/main";
+import { refreshProjects } from "./utils/main";
 import { showProjectsPanel } from "./utils/panel";
 import { SidebarProvider } from "./utils/sidebar";
 
@@ -30,7 +30,7 @@ export async function activate(context: vscode.ExtensionContext) {
     // disposable1,
     disposable2,
     disposable3,
-    disposable4,
+    disposable4
   );
 }
 

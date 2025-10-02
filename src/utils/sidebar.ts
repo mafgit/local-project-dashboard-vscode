@@ -182,7 +182,7 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
           justify-content: space-between;
           align-items: center;
           gap: 4px;
-          padding: 8px 5px;
+          padding: 8px;
           background: rgba(0,0,0,0.5);
           list-style: none;
           border-radius: 5px;
@@ -204,7 +204,14 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 
         button {
           height: 30px;
+        }
+
+        button:nth-child(1) {
           flex: 1;
+        }
+
+        button:nth-child(2) {
+          flex: 2;
         }
       }
     </style>

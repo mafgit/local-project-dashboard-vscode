@@ -28,14 +28,14 @@ export function showProjectsPanel(context: vscode.ExtensionContext) {
   panel.iconPath = vscode.Uri.joinPath(
     context.extensionUri,
     "media",
-    "icon.svg"
+    "icon.png"
   );
 
   panel.onDidDispose(() => {
     panelDisposed = true;
     panel = undefined;
   });
-  
+
   const getUri = (file: string) => {
     return panel?.webview
       .asWebviewUri(
@@ -46,15 +46,7 @@ export function showProjectsPanel(context: vscode.ExtensionContext) {
 
   panel.webview.html = getWebviewPanelHTML(getUri);
 
-
-  const dirs: GlobalStateDirs = context.globalState.get("dirs", {});
-
-  if (dirs) {
-    panel.webview.postMessage({
-      name: "globalStateLoad",
-      data: dirs,
-    });
-  }
+  sendUpdateMessageToPanelUI(context, panel);
 
   // receive message
   panel.webview.onDidReceiveMessage(
@@ -67,9 +59,39 @@ export function showProjectsPanel(context: vscode.ExtensionContext) {
             forceNewWindow: true,
           }
         );
+      } else if (name === "toggleStar") {
+        const dirs = context.globalState.get<GlobalStateDirs>("dirs", {});
+        const [base, proj] = data as [string, string];
+        const starred = dirs[base][proj].starred;
+
+        await context.globalState.update("dirs", {
+          ...dirs,
+          [base]: {
+            ...dirs[base],
+            [proj]: {
+              ...dirs[base][proj],
+              starred: !starred,
+            },
+          },
+        });
+
+        sendUpdateMessageToPanelUI(context, panel);
       }
     }
   );
+}
+
+function sendUpdateMessageToPanelUI(
+  context: vscode.ExtensionContext,
+  panel: vscode.WebviewPanel | undefined
+) {
+  const dirs: GlobalStateDirs = context.globalState.get("dirs", {});
+  if (dirs) {
+    panel?.webview.postMessage({
+      name: "globalStateLoad",
+      data: dirs,
+    });
+  }
 }
 
 export function getWebviewPanelHTML(getUri: (file: string) => any) {
@@ -140,8 +162,8 @@ export function getWebviewPanelHTML(getUri: (file: string) => any) {
                         "pencil-solid-full.svg"
                       )}" alt="edit" />
                     </button> -->
-                    <button class="project-star-btn">
-                      <img src="${getUri("star-solid-full.svg")}" alt="star" />
+                    <button class="project-star-btn \${project.starred ? 'starred' : ''}">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"><!--!Font Awesome Free 7.0.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path fill="currentColor" d="M341.5 45.1C337.4 37.1 329.1 32 320.1 32C311.1 32 302.8 37.1 298.7 45.1L225.1 189.3L65.2 214.7C56.3 216.1 48.9 222.4 46.1 231C43.3 239.6 45.6 249 51.9 255.4L166.3 369.9L141.1 529.8C139.7 538.7 143.4 547.7 150.7 553C158 558.3 167.6 559.1 175.7 555L320.1 481.6L464.4 555C472.4 559.1 482.1 558.3 489.4 553C496.7 547.7 500.4 538.8 499 529.8L473.7 369.9L588.1 255.4C594.5 249 596.7 239.6 593.9 231C591.1 222.4 583.8 216.1 574.8 214.7L415 189.3L341.5 45.1z"/></svg>
                     </button>
                   </div>
                 </div>
@@ -168,9 +190,11 @@ export function getWebviewPanelHTML(getUri: (file: string) => any) {
                   </div>\`;
                 }
 
-              // todo: star
               // todo: edit name
 
+              article.querySelector('.project-star-btn').onclick = () => {
+                vscode.postMessage({ name: "toggleStar", data: [key, projectKey] })
+              }
 
               article.querySelector(".open-btn").onclick = () => {
                 vscode.postMessage({ name: "openProject", data: [key, projectKey] });

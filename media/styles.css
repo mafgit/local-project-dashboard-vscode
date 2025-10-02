@@ -6,7 +6,6 @@
 
 body {
   /* font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif; */
-  background: rgb(24, 24, 24);
   padding: 30px;
   display: flex;
   gap: 30px;
@@ -58,7 +57,7 @@ button {
       border-radius: 5px;
       padding: 5px 8px;
       width: max-content;
-      background-color: #2f263d;
+      border: 1px solid #535353a8;
       font-size: 0.8rem !important;
     }
   }
@@ -70,11 +69,12 @@ button {
   gap: 10px;
 
   .project {
-    background: linear-gradient(#292431, #242931);
+    background: linear-gradient(#09162933, #100b2b34);
     border-radius: 10px;
     gap: 8px;
     display: flex;
     flex-direction: column;
+    border: 1px solid #535353a8;
     padding: 10px;
 
     .project-head {
@@ -102,6 +102,24 @@ button {
           &.project-edit-btn path {
             fill: blue;
           }
+
+          &.project-star-btn {
+            &:not(.starred) {
+              opacity: 0.7;
+
+              &:hover {
+                opacity: 1;
+              }
+            }
+
+            svg path {
+              fill: white;
+            }
+
+            &.starred svg path {
+              fill: yellow !important;
+            }
+          }
         }
       }
     }
@@ -127,13 +145,13 @@ button {
 
           &.html,
           &.xml {
-            background: red;
+            background: #e34c26;
           }
 
           &.css,
           &.scss,
           &.sass {
-            background: rgb(24, 182, 255);
+            background: #264de4;
           }
 
           &.js,
@@ -144,19 +162,55 @@ button {
 
           &.ts,
           &.tsx {
-            background: #0026ff;
+            background: #3178c6;
           }
 
           &.py {
-            background: #4781ff;
+            background: #3776ab;
           }
 
-          &.cpp {
-            background: #e415ff;
+          &.java {
+            background: #f89820;
+          }
+
+          &.cpp,
+          &.cxx,
+          &.cc {
+            background: #00599c;
           }
 
           &.c {
-            background: #ff15c4;
+            background: #a8b9cc;
+          }
+
+          &.cs {
+            background: #68217a;
+          }
+
+          &.R,
+          &.r {
+            background-color: #276dc3;
+          }
+
+          &.go {
+            background: #00add8;
+          }
+
+          &.rb {
+            background: #cc342d;
+          }
+
+          &.php {
+            background: #777bb3;
+          }
+
+          &.swift {
+            background: #fa7343;
+          }
+
+          &.kt,
+          &.kts {
+            background: #7f52ff;
           }
         }
       }
@@ -170,7 +224,7 @@ button {
   margin-top: auto;
 
   .open-btn {
-    background: rgba(95, 151, 255, 0.486);
+    background: rgba(69, 134, 255, 0.548);
     color: #f1f1f1;
     padding: 5px 10px;
     margin-left: auto;
