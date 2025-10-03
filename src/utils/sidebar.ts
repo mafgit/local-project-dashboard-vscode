@@ -107,7 +107,7 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
   <head>
     <meta charset="UTF-8" />
     <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'nonce-${nonce}'; style-src vscode-resource: 'unsafe-inline'">
-    <title>LocalHub: Project Explorer</title>
+    <title>LocalHub — Project Explorer</title>
     <style nonce="${nonce}">
       * {margin: 0; padding: 0; box-sizing: border-box;}
 

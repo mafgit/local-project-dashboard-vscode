@@ -14,7 +14,7 @@ export function showProjectsPanel(context: vscode.ExtensionContext) {
 
   panel = vscode.window.createWebviewPanel(
     "localProjectOpenerWebview",
-    "LocalHub: Project Explorer",
+    "LocalHub — Project Explorer",
     vscode.ViewColumn.One,
     {
       retainContextWhenHidden: true,
@@ -103,7 +103,7 @@ export function getWebviewPanelHTML(getUri: (file: string) => any) {
     <meta charset="UTF-8" />
     <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src vscode-resource:; style-src vscode-resource: 'unsafe-inline'; script-src 'nonce-${nonce}';
 ">
-    <title>LocalHub: Project Explorer</title>
+    <title>LocalHub — Project Explorer</title>
     <link rel="stylesheet" href="${getUri("styles.css")}" />
   </head>
   <body>
