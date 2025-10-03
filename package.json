@@ -6,25 +6,32 @@
     "explorer",
     "viewer",
     "opener",
+    "dashboard",
+    "organizer",
+    "opener",
+    "manager",
     "localhub"
   ],
   "description": "View all projects in one place & open any project in a new tab without having to open it from explorer",
   "version": "0.0.1",
+  "license": "MIT",
   "icon": "media/icon.png",
   "repository": {
     "type": "git",
     "url": "https://github.com/mafgit/localhub-vscode"
   },
   "publisher": "mafgit",
+  "author": {
+    "name": "mafgit",
+    "url": "https://github.com/mafgit"
+  },
+  "homepage": "https://github.com/mafgit/localhub-vscode",
   "engines": {
     "vscode": "^1.104.0"
   },
   "categories": [
     "Visualization",
     "Other"
-  ],
-  "activationEvents": [
-    "onView:sidebarView"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -47,7 +54,7 @@
         {
           "id": "sidebarViewContainer",
           "title": "LocalHub — Project Explorer",
-          "icon": "media/icon.png"
+          "icon": "media/icon.svg"
         }
       ]
     },
@@ -57,7 +64,7 @@
           "type": "webview",
           "id": "sidebarView",
           "name": "LocalHub — Project Explorer",
-          "icon": "media/icon.png"
+          "icon": "media/icon.svg"
         }
       ]
     }

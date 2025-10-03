@@ -13,6 +13,12 @@ body {
   color: #f1f1f1;
 }
 
+html,
+body {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+}
+
 .msg-1 {
   text-align: center;
 }
@@ -44,22 +50,23 @@ button {
   display: flex;
   flex-direction: column;
   gap: 30px;
+  will-change: transform;
+}
 
-  .projects-section {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
+.projects-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 
-    .section-heading {
-      color: #e7e7e7;
-      font-style: italic;
-      font-weight: normal;
-      border-radius: 5px;
-      padding: 5px 8px;
-      width: max-content;
-      border: 1px solid #535353a8;
-      font-size: 0.8rem !important;
-    }
+  .section-heading {
+    color: #e7e7e7;
+    font-style: italic;
+    font-weight: normal;
+    border-radius: 5px;
+    padding: 5px 8px;
+    width: max-content;
+    border: 1px solid #535353a8;
+    font-size: 0.8rem !important;
   }
 }
 

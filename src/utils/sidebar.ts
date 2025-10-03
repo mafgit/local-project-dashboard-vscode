@@ -32,7 +32,7 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
       enableScripts: true,
     };
 
-    webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
+    webviewView.webview.html = this.getSidebarHTML(webviewView.webview);
 
     this.view?.webview.postMessage({
       name: "globalStateLoad",
@@ -99,7 +99,7 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
     );
   }
 
-  private _getHtmlForWebview(webview: vscode.Webview) {
+  private getSidebarHTML(webview: vscode.Webview) {
     const nonce = genNonce();
 
     return `<!DOCTYPE html>
@@ -110,7 +110,6 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
     <title>LocalHub — Project Explorer</title>
     <style nonce="${nonce}">
       * {margin: 0; padding: 0; box-sizing: border-box;}
-
     
       button:hover {
         filter: brightness(90%);
@@ -161,6 +160,10 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
         margin: 8px 5px;
         border-radius: 5px;
         width: 95%;
+      }
+
+      h3, h4, p {
+        text-align: center;
       }
 
       body {
