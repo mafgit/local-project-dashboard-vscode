@@ -117,7 +117,9 @@ export function getWebviewPanelHTML(
 
     <section class="projects-section" id="starred-section">
       <h2 class="section-heading">Starred</h2>
-      <div class="projects"></div>
+      <p class="msg-2">No starred project found.</p>
+      <div class="projects">
+      </div>
     </section>
     
     <main id="project-sections-container">
@@ -129,7 +131,7 @@ export function getWebviewPanelHTML(
       const starredProjectsDiv = document.querySelector('#starred-section .projects')
 
       window.addEventListener("message", ({ data: { name, data } }) => {
-        console.log(name, data)
+        // console.log(name, data)
         if (name === 'globalStateLoad') {
           projectSectionsContainer.innerHTML = ''
           starredProjectsDiv.innerHTML = ''
@@ -174,7 +176,9 @@ export function getWebviewPanelHTML(
           });
 
           if (!atLeastOneStarred) {
-            starredProjectsDiv.innerHTML = \`<p class="msg-2">No starred project.</p>\`;
+            document.querySelector('#starred-section .msg-2').style.display = 'block';
+          } else {
+            document.querySelector('#starred-section .msg-2').style.display = 'none';
           }
         }
       })
