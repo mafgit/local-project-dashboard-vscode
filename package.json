@@ -10,6 +10,10 @@
   ],
   "description": "View all projects in one place & open any project in a new tab without having to open it from explorer",
   "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mafgit/localhub-vscode"
+  },
   "engines": {
     "vscode": "^1.104.0"
   },
