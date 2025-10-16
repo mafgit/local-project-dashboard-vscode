@@ -2,74 +2,80 @@ import * as vscode from "vscode";
 import fs from "fs/promises";
 import { walkHelper } from "./walk";
 import path from "path";
-import { GlobalStateDirs } from "./sidebar";
 
-let arr: (vscode.QuickPickItem & { path: string })[] = [];
+// dirs = {
+// 	'C:\projs': {
+// 		'app1': { languages: {}, starred: true },
+// 		'app2': { languages: {}, starred: false }
+// 	},
+// 	'D:\codes': {}
+// }
 
 export async function refreshProjects(context: vscode.ExtensionContext) {
   await vscode.window.withProgress(
     {
       location: vscode.ProgressLocation.Notification,
-      title:
-        "LocalHub — Refreshing project directories. May take a while.",
+      title: "LocalHub — Refreshing project directories. May take a while.",
       cancellable: true,
     },
     async (progress, token) => {
       progress.report({ increment: 0, message: "..." });
-      arr = [];
 
-      const dirs = context.globalState.get<GlobalStateDirs>("dirs", {});
+      const oldDirs = context.globalState.get<GlobalStateDirs>("dirs", {});
+      const newDirs: GlobalStateDirs = {};
 
-      for (const dir of Object.keys(dirs)) {
-        const children = await fs.readdir(dir); // todo: check whether it is a folder or file
+      for (const baseDir of Object.keys(oldDirs)) {
+        try {
+          const projects = await fs.readdir(baseDir);
 
-        for (let child of children) {
-          const itemPath = path.join(dir, child);
-          // const item = {
-          //   path: path.join(dir, value),
-          //   label: `$(folder) ${value}`,
-          //   detail: "",
-          // };
+          newDirs[baseDir] = {};
 
-          const extCount = await walkHelper(itemPath, 4);
+          for (let proj of projects) {
+            const itemPath = path.join(baseDir, proj);
+            // console.log(' -- ', itemPath);
 
-          // const entries = Object.entries(extCount);
-          // entries.sort((a, b) => b[1] - a[1]);
-          // for (let [key, value] of entries) {
-          //   item.detail += `$(debug-breakpoint-data-unverified) ${value.toFixed(
-          //     1
-          //   )}% ${key.slice(1)}`;
-          // }
-          // arr.push(item);
+            const stats = await fs.stat(itemPath);
 
-          dirs[dir][child] = { languages: extCount, starred: false }; // todo: check if already starred
+            if (stats.isDirectory() && !proj.startsWith(".")) {
+              const extDist = await walkHelper(itemPath, 4);
+
+              let starred = false;
+
+              if (oldDirs[baseDir][proj]) {
+                starred = oldDirs[baseDir][proj].starred;
+              }
+
+              const projectDiscovered = {
+                languages: extDist,
+                starred,
+              };
+
+              newDirs[baseDir][proj] = projectDiscovered;
+            }
+          }
+        } catch (err: any) {
+          console.log(err); // err.code == 'ENOENT' means baseDir isn't actually available (i.e. was deleted by user in his PC)
         }
       }
 
-      await context.globalState.update("dirs", dirs);
+      await context.globalState.update("dirs", newDirs);
 
       progress.report({ increment: 100, message: "Done!" });
     }
   );
 }
 
-export async function openProject() {
-  const picked = await vscode.window.showQuickPick(arr, {
-    title: "Select Project To Open In New Tab",
-    matchOnDescription: true,
-  });
-
-  if (!picked) return;
-  vscode.window.showInformationMessage(picked.path);
-  await vscode.commands.executeCommand(
-    "vscode.openFolder",
-    vscode.Uri.file(picked.path),
-    {
-      forceNewWindow: true,
-    }
-  );
-}
-
 export const genNonce = () => {
-  return Math.ceil(Math.random() * 1234213430).toString();
+  return Math.ceil(Math.random() * 1234213438).toString();
 };
+
+export type GlobalStateDirs = Record<
+  string,
+  Record<
+    string,
+    {
+      languages: Record<string, number>;
+      starred: boolean;
+    }
+  >
+>;

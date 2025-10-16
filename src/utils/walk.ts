@@ -3,8 +3,9 @@ import fs from "fs/promises";
 
 // sub-files check
 export async function walkHelper(itemPath: string, depth = 4) {
-  const extCount: Record<string, number> = {};
+  const extDist: Record<string, number> = {}; // probability distribution of file extensions used 
   let totalCount = 0;
+  const gitIgnoreSet = new Set<string>(); // todo: ...
 
   async function walk(itemPath: string, depth: number) {
     if (depth <= 1) return;
@@ -16,38 +17,59 @@ export async function walkHelper(itemPath: string, depth = 4) {
       for (let dirent of dirents) {
         if (dirent.isFile()) {
           const ext = path.extname(dirent.name);
-          if (
-            !ext ||
-            dirent.name.endsWith(".config.ts") ||
-            dirent.name.endsWith(".config.js") ||
-            dirent.name.endsWith(".config.mjs") ||
-            !acceptExts.has(ext)
-          )
-            continue;
-
+          if (shouldIgnoreFile(dirent.name, ext, gitIgnoreSet)) continue;
           // console.log("-> ", dirent.name);
-          extCount[ext] = (extCount[ext] || 0) + 1;
+          extDist[ext] = (extDist[ext] || 0) + 1;
           totalCount++;
         } else if (
           dirent.isDirectory() &&
-          !dirent.name.startsWith(".") &&
-          !ignoreFolders.has(dirent.name)
+          !shouldIgnoreFolder(dirent.name, gitIgnoreSet)
         ) {
           // console.log("Exploring ", dirent.name + "/");
           await walk(path.join(itemPath, dirent.name), depth - 1);
         }
       }
-    } catch (err) {
-      console.error(err);
+    } catch (err: any) {
+      if (err.code === "ENOENT") {
+        throw err;
+      }
     }
   }
 
   await walk(itemPath, depth);
 
-  Object.entries(extCount).forEach(([key, value]) => {
-    extCount[key] = totalCount > 0 ? (value * 100) / totalCount : 0;
+  Object.entries(extDist).forEach(([key, value]) => {
+    extDist[key] = totalCount > 0 ? (value * 100) / totalCount : 0;
   });
-  return extCount;
+  return extDist;
+}
+
+function shouldIgnoreFile(
+  direntName: string,
+  ext: string,
+  gitIgnoreSet: Set<string>
+) {
+  return (
+    !ext ||
+    direntName.endsWith(".config.ts") ||
+    direntName.endsWith(".config.js") ||
+    direntName.endsWith(".config.mjs") ||
+    !acceptExts.has(ext) ||
+    isGitIgnored(gitIgnoreSet, direntName)
+  );
+}
+
+function shouldIgnoreFolder(direntName: string, gitIgnoreSet: Set<string>) {
+  return (
+    !direntName.startsWith(".") &&
+    !ignoreFolders.has(direntName) &&
+    !isGitIgnored(gitIgnoreSet, direntName)
+  );
+}
+
+// todo: the following
+function isGitIgnored(gitIgnoreSet: Set<string>, dirent: string) {
+  return false;
 }
 
 // walkHelper("C:\\Users\\DC\\codes\\flights", 4).then((a) => console.log(a));

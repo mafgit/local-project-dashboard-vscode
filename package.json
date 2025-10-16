@@ -38,10 +38,6 @@
   "contributes": {
     "commands": [
       {
-        "command": "localhub.openProject",
-        "title": "Open A Project In New Window"
-      },
-      {
         "command": "localhub.refreshProjects",
         "title": "Refresh Projects"
       },

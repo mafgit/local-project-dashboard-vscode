@@ -1,13 +1,13 @@
 import * as vscode from "vscode";
 import path from "path";
 import { genNonce } from "./main";
-import { GlobalStateDirs } from "./sidebar";
+import { GlobalStateDirs } from "./main";
 
 export let panel: vscode.WebviewPanel | undefined;
-// let panelDisposed = false;
+let panelDisposed = false;
 
 export function showProjectsPanel(context: vscode.ExtensionContext) {
-  if (panel /*&& !panelDisposed*/) {
+  if (panel && !panelDisposed) {
     panel.reveal();
     return;
   }
@@ -31,10 +31,10 @@ export function showProjectsPanel(context: vscode.ExtensionContext) {
     "icon.svg"
   );
 
-  // panel.onDidDispose(() => {
-  //   panelDisposed = true;
-  //   panel = undefined;
-  // });
+  panel.onDidDispose(() => {
+    panelDisposed = true;
+    panel = undefined;
+  });
 
   const getUri = (file: string) => {
     return panel!.webview

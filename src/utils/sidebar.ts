@@ -1,24 +1,13 @@
 import * as vscode from "vscode";
-import { genNonce } from "./main";
+import { genNonce, GlobalStateDirs } from "./main";
 import { panel } from "./panel";
-
-export type GlobalStateDirs = Record<
-  string,
-  Record<
-    string,
-    {
-      languages: Record<string, number>;
-      starred: boolean;
-    }
-  >
->;
 
 export class SidebarProvider implements vscode.WebviewViewProvider {
   public view?: vscode.WebviewView;
-  private _context: vscode.ExtensionContext;
+  private context: vscode.ExtensionContext;
 
   constructor(context: vscode.ExtensionContext) {
-    this._context = context;
+    this.context = context;
   }
 
   public resolveWebviewView(
@@ -36,14 +25,14 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
 
     this.view?.webview.postMessage({
       name: "globalStateLoad",
-      data: Object.keys(this._context.globalState.get("dirs", {})),
+      data: Object.keys(this.context.globalState.get("dirs", {})),
     });
 
     this.view?.onDidChangeVisibility(() => {
       if (this.view?.visible) {
         this.view?.webview.postMessage({
           name: "globalStateLoad",
-          data: Object.keys(this._context.globalState.get("dirs", {})),
+          data: Object.keys(this.context.globalState.get("dirs", {})),
         });
       }
     });
@@ -60,11 +49,11 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
           });
 
           if (!result || result.length === 0) return;
-          const oldDirs = this._context.globalState.get<GlobalStateDirs>(
+          const oldDirs = this.context.globalState.get<GlobalStateDirs>(
             "dirs",
             {}
           );
-          this._context.globalState.update("dirs", {
+          this.context.globalState.update("dirs", {
             ...oldDirs,
             [result[0].fsPath]: {},
           });
@@ -74,11 +63,11 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
             data: result[0].fsPath,
           });
         } else if (name === "removeDirectory") {
-          const oldDirs = this._context.globalState.get<GlobalStateDirs>(
+          const oldDirs = this.context.globalState.get<GlobalStateDirs>(
             "dirs",
             {}
           );
-          await this._context.globalState.update("dirs", {
+          await this.context.globalState.update("dirs", {
             ...oldDirs,
             [data]: undefined,
           });
@@ -92,7 +81,7 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
           await vscode.commands.executeCommand("localhub.refreshProjects");
           panel?.webview.postMessage({
             name: "globalStateLoad",
-            data: this._context.globalState.get("dirs", {}),
+            data: this.context.globalState.get("dirs", {}),
           });
         }
       }
