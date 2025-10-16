@@ -3,7 +3,7 @@ import fs from "fs/promises";
 
 // sub-files check
 export async function walkHelper(itemPath: string, depth = 4) {
-  const extDist: Record<string, number> = {}; // probability distribution of file extensions used 
+  const extDist: Record<string, number> = {}; // probability distribution of file extensions used
   let totalCount = 0;
   const gitIgnoreSet = new Set<string>(); // todo: ...
 
@@ -61,9 +61,9 @@ function shouldIgnoreFile(
 
 function shouldIgnoreFolder(direntName: string, gitIgnoreSet: Set<string>) {
   return (
-    !direntName.startsWith(".") &&
-    !ignoreFolders.has(direntName) &&
-    !isGitIgnored(gitIgnoreSet, direntName)
+    direntName.startsWith(".") ||
+    ignoreFolders.has(direntName) ||
+    isGitIgnored(gitIgnoreSet, direntName)
   );
 }
 

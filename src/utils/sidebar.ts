@@ -15,20 +15,20 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
     context: vscode.WebviewViewResolveContext,
     token: vscode.CancellationToken
   ): Thenable<void> | void {
-    this.view = webviewView;
-
     webviewView.webview.options = {
       enableScripts: true,
     };
 
     webviewView.webview.html = this.getSidebarHTML(webviewView.webview);
 
-    this.view?.webview.postMessage({
+    this.view = webviewView;
+
+    this.view.webview.postMessage({
       name: "globalStateLoad",
       data: Object.keys(this.context.globalState.get("dirs", {})),
     });
 
-    this.view?.onDidChangeVisibility(() => {
+    this.view.onDidChangeVisibility(() => {
       if (this.view?.visible) {
         this.view?.webview.postMessage({
           name: "globalStateLoad",
@@ -37,7 +37,7 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
       }
     });
 
-    this.view?.webview.onDidReceiveMessage(
+    this.view.webview.onDidReceiveMessage(
       async ({ name, data }: { name: string; data: any }) => {
         console.debug(`\n========== ${name} received`, data, "\n");
         if (name === "addDirectory") {
