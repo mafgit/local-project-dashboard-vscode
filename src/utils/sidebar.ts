@@ -99,7 +99,17 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
     <title>LocalHub — Project Explorer</title>
     <style nonce="${nonce}">
       * {margin: 0; padding: 0; box-sizing: border-box;}
-    
+
+      body.vscode-light {
+        --hr-color: rgba(0, 0, 0, 0.22);
+        --li-bg: rgba(56, 56, 56, 0.13);
+      }
+      
+      body.vscode-dark {
+        --hr-color: rgba(255,255,255,0.3);
+        --li-bg: rgba(223, 223, 223, 0.13);
+      }
+
       button:hover {
         filter: brightness(90%);
       }
@@ -124,7 +134,7 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
           display: flex;
           justify-content: center;
           align-items: center;
-          background-color: #ff1e0077;
+          background-color: #ff1e00ad;
           width: max-content;
         }
 
@@ -133,7 +143,7 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
         }
           
         &#refresh-btn {
-          background: #00c92bb6;
+          background: #00ac25ff;
         }
 
         &#show-projects-btn {
@@ -144,14 +154,13 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
       }
 
       hr {
-        border: none;
-        border-top: 1px solid rgba(255,255,255,0.3);
+        border: 1px solid var(--hr-color);
         margin: 8px 5px;
         border-radius: 5px;
         width: 95%;
       }
 
-      h3, h4, p {
+      h3, h4 {
         text-align: center;
       }
 
@@ -175,7 +184,7 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
           align-items: center;
           gap: 4px;
           padding: 8px;
-          background: rgba(0,0,0,0.5);
+          background: var(--li-bg);
           list-style: none;
           border-radius: 5px;
           width: 100%;
@@ -210,13 +219,13 @@ export class SidebarProvider implements vscode.WebviewViewProvider {
   </head>
   <body>
     <h3 style="font-weight: bold;">LocalHub</h3>
-    <p>View all your local projects in one place</p>
+    <p style="text-align: center;">View all your local projects in one place</p>
     <button id="show-projects-btn"><svg width="14" height="14" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--!Font Awesome Free v7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path fill="white" d="M88 96c22.1 0 40 17.9 40 40l0 48c0 22.1-17.9 40-40 40l-48 0c-22.1 0-40-17.9-40-40l0-48c0-22.1 17.9-40 40-40l48 0zM280 224l-48 0c-22.1 0-40-17.9-40-40l0-48c0-22.1 17.9-40 40-40l48 0c22.1 0 40 17.9 40 40l0 48c0 22.1-17.9 40-40 40zm192 0l-48 0c-22.1 0-40-17.9-40-40l0-48c0-22.1 17.9-40 40-40l48 0c22.1 0 40 17.9 40 40l0 48c0 22.1-17.9 40-40 40zm0 192l-48 0c-22.1 0-40-17.9-40-40l0-48c0-22.1 17.9-40 40-40l48 0c22.1 0 40 17.9 40 40l0 48c0 22.1-17.9 40-40 40zM280 288c22.1 0 40 17.9 40 40l0 48c0 22.1-17.9 40-40 40l-48 0c-22.1 0-40-17.9-40-40l0-48c0-22.1 17.9-40 40-40l48 0zM88 416l-48 0c-22.1 0-40-17.9-40-40l0-48c0-22.1 17.9-40 40-40l48 0c22.1 0 40 17.9 40 40l0 48c0 22.1-17.9 40-40 40z"/></svg> <span>Show Projects</span></button>
     
     <hr>
     
     <h4>Base Directories</h4>
-    <p>Add a directory and load projects from it</p>
+    <p style="text-align: center;">Add a directory and load projects from it</p>
     <ul id="directories"></ul>
     <div class="two-btns">
       <button id="add-btn"><svg width="18" height="18" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"><!--!Font Awesome Free v7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path fill="white" d="M576 448C576 483.3 547.3 512 512 512L128 512C92.7 512 64 483.3 64 448L64 160C64 124.7 92.7 96 128 96L266.7 96C280.5 96 294 100.5 305.1 108.8L343.5 137.6C349 141.8 355.8 144 362.7 144L512 144C547.3 144 576 172.7 576 208L576 448zM320 224C306.7 224 296 234.7 296 248L296 296L248 296C234.7 296 224 306.7 224 320C224 333.3 234.7 344 248 344L296 344L296 392C296 405.3 306.7 416 320 416C333.3 416 344 405.3 344 392L344 344L392 344C405.3 344 416 333.3 416 320C416 306.7 405.3 296 392 296L344 296L344 248C344 234.7 333.3 224 320 224z"/></svg><span>Add</span></button>

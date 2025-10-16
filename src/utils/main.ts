@@ -24,6 +24,9 @@ export async function refreshProjects(context: vscode.ExtensionContext) {
       const oldDirs = context.globalState.get<GlobalStateDirs>("dirs", {});
       const newDirs: GlobalStateDirs = {};
 
+      console.log(Object.keys(oldDirs));
+      
+
       for (const baseDir of Object.keys(oldDirs)) {
         try {
           const projects = await fs.readdir(baseDir);

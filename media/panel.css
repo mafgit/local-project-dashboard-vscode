@@ -1,3 +1,23 @@
+body.vscode-dark {
+  --proj-bg: linear-gradient(#09162933, #100b2b34);
+  --open-btn-bg: #4586ff8c;
+  --open-btn-color: #f1f1f1;
+  --section-heading-color: #e7e7e7;
+  --lang-color: #f1f1f1;
+  --proj-border-color: #7c7c7c6c;
+  --unstarred-fill: #d6d6d6;
+}
+
+body.vscode-light {
+  --proj-bg: #eeeeee9c;
+  --open-btn-bg: #1466ffc5;
+  --open-btn-color: #f1f1f1;
+  --section-heading-color: #1b1b1b;
+  --lang-color: #f1f1f1;
+  --proj-border-color: #b8b8b8a8;
+  --unstarred-fill: #8f8f8f;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -10,7 +30,6 @@ body {
   display: flex;
   gap: 30px;
   flex-direction: column;
-  color: #f1f1f1;
 }
 
 html,
@@ -25,6 +44,14 @@ body {
 
 h1 {
   text-align: center;
+}
+
+.top-heading {
+  font-size: 1.2rem;
+  width: max-content;
+  padding: 8px;
+  margin: 0 auto;
+  border-radius: 8px;
 }
 
 button,
@@ -59,7 +86,7 @@ button {
   gap: 12px;
 
   .section-heading {
-    color: #e7e7e7;
+    color: var(--section-heading-color);
     font-style: italic;
     font-weight: normal;
     border-radius: 5px;
@@ -76,12 +103,12 @@ button {
   gap: 10px;
 
   .project {
-    background: linear-gradient(#09162933, #100b2b34);
+    background: var(--proj-bg);
     border-radius: 10px;
     gap: 8px;
     display: flex;
     flex-direction: column;
-    border: 1px solid #535353a8;
+    border: 1px solid var(--proj-border-color);
     padding: 10px;
 
     .project-head {
@@ -120,11 +147,11 @@ button {
             }
 
             svg path {
-              fill: white;
+              fill: var(--unstarred-fill) !important;
             }
 
             &.starred svg path {
-              fill: yellow !important;
+              fill: rgb(233, 217, 0) !important;
             }
           }
         }
@@ -141,7 +168,7 @@ button {
         gap: 5px;
         justify-content: center;
         align-items: center;
-        color: #e0dfdf;
+        /* color: var(--lang-color); */
 
         .language-icon {
           width: 8px;
@@ -231,8 +258,8 @@ button {
   margin-top: auto;
 
   .open-btn {
-    background: rgba(69, 134, 255, 0.548);
-    color: #f1f1f1;
+    background: var(--open-btn-bg);
+    color: var(--open-btn-color);
     padding: 5px 10px;
     margin-left: auto;
     border-radius: 8px;

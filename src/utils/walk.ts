@@ -51,6 +51,7 @@ function shouldIgnoreFile(
 ) {
   return (
     !ext ||
+    direntName.startsWith(".") ||
     direntName.endsWith(".config.ts") ||
     direntName.endsWith(".config.js") ||
     direntName.endsWith(".config.mjs") ||

@@ -25,11 +25,10 @@ export function showProjectsPanel(context: vscode.ExtensionContext) {
     }
   );
 
-  panel.iconPath = vscode.Uri.joinPath(
-    context.extensionUri,
-    "media",
-    "icon.svg"
-  );
+  panel.iconPath = {
+    dark: vscode.Uri.joinPath(context.extensionUri, "media", "light-icon.svg"),
+    light: vscode.Uri.joinPath(context.extensionUri, "media", "icon.svg"),
+  };
 
   panel.onDidDispose(() => {
     panelDisposed = true;
@@ -110,7 +109,7 @@ export function getWebviewPanelHTML(
     <link rel="stylesheet" href="${getUri("panel.css")}" />
   </head>
   <body>
-    <h1 style="font-weight: normal; text-transform: uppercase; letter-spacing: 1px;">👋 Welcome to LocalHub!</h1>
+    <h1 class="top-heading">LocalHub</h1>
 
     <p class="msg-1">No project found. From sidebar, add directory wherein your projects live directly, then click load.</p>
 
