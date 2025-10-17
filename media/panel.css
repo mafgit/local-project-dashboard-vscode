@@ -263,14 +263,22 @@ button {
 
 .project-bottom {
   width: 100%;
+  gap: 5px;
   display: flex;
   margin-top: auto;
+  justify-content: flex-end;
+  align-items: flex-end;
 
+  .open-folder-btn {
+    background: none;
+    display: flex;
+    align-items: flex-end;
+  }
+  
   .open-btn {
     background: var(--open-btn-bg);
     color: var(--open-btn-color);
     padding: 5px 10px;
-    margin-left: auto;
     border-radius: 8px;
   }
 }

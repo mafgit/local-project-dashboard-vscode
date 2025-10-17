@@ -55,6 +55,8 @@ export function showProjectsPanel(context: vscode.ExtensionContext) {
             forceNewWindow: true,
           }
         );
+      } else if (name === "openFolder") {
+        await vscode.env.openExternal(vscode.Uri.file(path.join(...data)));
       } else if (name === "toggleStar") {
         const dirs = context.globalState.get<GlobalStateDirs>("dirs", {});
         const [base, proj] = data as [string, string];
@@ -199,6 +201,7 @@ export function getWebviewPanelHTML(cspSource: string, baseUri: string) {
           <div class="languages"></div>
 
           <div class="project-bottom">
+            <button class="open-folder-btn"><img width="20" src="${baseUri}/folder-solid-full.svg"/></button>
             <button class="open-btn">Open</button>
           </div>
         \`;
@@ -226,6 +229,10 @@ export function getWebviewPanelHTML(cspSource: string, baseUri: string) {
 
         projectArticle.querySelector(".open-btn").onclick = () => {
           vscode.postMessage({ name: "openProject", data: [baseDir, projectName] });
+        };
+
+        projectArticle.querySelector(".open-folder-btn").onclick = () => {
+          vscode.postMessage({ name: "openFolder", data: [baseDir, projectName] });
         };
 
         return projectArticle;
