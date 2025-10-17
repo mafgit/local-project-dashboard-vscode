@@ -47,35 +47,39 @@ export function showProjectsPanel(context: vscode.ExtensionContext) {
   // receive message
   panel.webview.onDidReceiveMessage(
     async ({ name, data }: { name: string; data: any }) => {
-      if (name === "openProject") {
-        await vscode.commands.executeCommand(
-          "vscode.openFolder",
-          vscode.Uri.file(path.join(...data)),
-          {
-            forceNewWindow: true,
-          }
-        );
-      } else if (name === "openFolder") {
-        await vscode.env.openExternal(vscode.Uri.file(path.join(...data)));
-      } else if (name === "toggleStar") {
-        const dirs = context.globalState.get<GlobalStateDirs>("dirs", {});
-        const [base, proj] = data as [string, string];
-        if (!dirs[base] || !dirs[base][proj]) return;
+      try {
+        if (name === "openProject") {
+          await vscode.commands.executeCommand(
+            "vscode.openFolder",
+            vscode.Uri.file(path.join(...data)),
+            {
+              forceNewWindow: true,
+            }
+          );
+        } else if (name === "openFolder") {
+          await vscode.env.openExternal(vscode.Uri.file(path.join(...data)));
+        } else if (name === "toggleStar") {
+          const dirs = context.globalState.get<GlobalStateDirs>("dirs", {});
+          const [base, proj] = data as [string, string];
+          if (!dirs[base] || !dirs[base][proj]) return;
 
-        const starred = dirs[base][proj].starred;
+          const starred = dirs[base][proj].starred;
 
-        await context.globalState.update("dirs", {
-          ...dirs,
-          [base]: {
-            ...dirs[base],
-            [proj]: {
-              ...dirs[base][proj],
-              starred: !starred,
+          await context.globalState.update("dirs", {
+            ...dirs,
+            [base]: {
+              ...dirs[base],
+              [proj]: {
+                ...dirs[base][proj],
+                starred: !starred,
+              },
             },
-          },
-        });
+          });
 
-        sendUpdateMessageToPanelUI(context, panel);
+          sendUpdateMessageToPanelUI(context, panel);
+        }
+      } catch (err: any) {
+        console.log(err);
       }
     }
   );
