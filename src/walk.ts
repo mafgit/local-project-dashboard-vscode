@@ -30,6 +30,14 @@ export async function walkHelper(itemPath: string, depth = 4) {
       if (!framework) {
         const direntNames = new Set(dirents.map((d) => d.name));
 
+        if (direntNames.has("composer.json")) {
+          if (direntNames.has("artisan") && direntNames.has("vendor")) {
+            framework = "laravel";
+          } else {
+            framework = "php";
+          }
+        }
+
         if (direntNames.has("pubspec.yaml")) {
           framework = "flutter";
         } else if (direntNames.has("build.gradle.kts")) {
@@ -42,7 +50,9 @@ export async function walkHelper(itemPath: string, depth = 4) {
         } else if (direntNames.has("package.json")) {
           isNodeApp = true; // fallback
 
-          if (
+          if (direntNames.has("android") && direntNames.has("ios")) {
+            framework = "react-native";
+          } else if (
             direntNames.has("next.config.js") ||
             direntNames.has("next.config.ts") ||
             direntNames.has("next.config.mjs")
@@ -63,23 +73,20 @@ export async function walkHelper(itemPath: string, depth = 4) {
             direntNames.has("nuxt.config.mjs")
           ) {
             framework = "nuxt";
+          } else if (
+            direntNames.has("svelte.config.js") ||
+            direntNames.has("svelte.config.ts")
+          ) {
+            framework = "svelte";
           }
 
           if (direntNames.has("tsconfig.json")) isTypescriptApp = true; // fallback
-        } else if (direntNames.has("composer.json")) {
-          if (direntNames.has("artisan") && direntNames.has("vendor")) {
-            framework = "laravel";
-          } else {
-            framework = "php";
-          }
         } else if (
           direntNames.has("pyproject.toml") ||
           direntNames.has("requirements.txt")
         ) {
           isPythonApp = true;
           framework = "python";
-        } else if (direntNames.has("svelte.config.js")) {
-          framework = "svelte";
         }
       }
 

@@ -199,6 +199,10 @@ button {
             background: yellow;
           }
 
+          &.astro {
+            background: #f15a5a;
+          }
+
           &.ts,
           &.tsx {
             background: #3178c6;
