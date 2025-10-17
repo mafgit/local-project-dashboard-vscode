@@ -2,6 +2,7 @@ import * as vscode from "vscode";
 import fs from "fs/promises";
 import { walkHelper } from "./walk";
 import path from "path";
+import { GlobalStateDirs } from "./GlobalStateDirs";
 
 // dirs = {
 // 	'C:\projs': {
@@ -67,18 +68,3 @@ export async function refreshProjects(context: vscode.ExtensionContext) {
     }
   );
 }
-
-export const genNonce = () => {
-  return Math.ceil(Math.random() * 1234213438).toString();
-};
-
-export type GlobalStateDirs = Record<
-  string,
-  Record<
-    string,
-    {
-      languages: Record<string, number>;
-      starred: boolean;
-    }
-  >
->;

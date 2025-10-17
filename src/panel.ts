@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
 import path from "path";
-import { genNonce } from "./main";
-import { GlobalStateDirs } from "./main";
+import { genNonce } from "./extension";
+import { GlobalStateDirs } from "./GlobalStateDirs";
 
 export let panel: vscode.WebviewPanel | undefined;
 let panelDisposed = false;

@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
-import { refreshProjects } from "./utils/main";
-import { showProjectsPanel } from "./utils/panel";
-import { SidebarProvider } from "./utils/sidebar";
+import { refreshProjects } from "./refresh";
+import { showProjectsPanel } from "./panel";
+import { SidebarProvider } from "./sidebar";
 
 export async function activate(context: vscode.ExtensionContext) {
   console.log("Welcome to LocalHub — Project Explorer!");
@@ -24,4 +24,7 @@ export async function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(disposable1, disposable2, disposable3);
 }
 
-export function deactivate() {}
+export function deactivate() {}export const genNonce = () => {
+  return Math.ceil(Math.random() * 1234213438).toString();
+};
+

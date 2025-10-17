@@ -1,5 +1,6 @@
 import * as vscode from "vscode";
-import { genNonce, GlobalStateDirs } from "./main";
+import { GlobalStateDirs } from "../GlobalStateDirs";
+import { genNonce } from "../extension";
 import { panel } from "./panel";
 
 export class SidebarProvider implements vscode.WebviewViewProvider {
