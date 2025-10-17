@@ -1,6 +1,7 @@
 import * as vscode from "vscode";
 import path from "path";
-import { genNonce, MAX_LANGUAGES_TO_SHOW } from "./extension";
+import { genNonce } from "./extension";
+import { MAX_LANGUAGES_TO_SHOW } from "./constants";
 import { GlobalStateDirs } from "./GlobalStateDirs";
 
 export let panel: vscode.WebviewPanel | undefined;

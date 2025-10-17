@@ -2,7 +2,6 @@
 
 ## [Todo]
 
-- Detect project frameworks such as React, Vue, Django, Angular, etc
 - Optimize HTML rendering for starred and adding/removing and other things
 - Project sorting
 - Edit folder name

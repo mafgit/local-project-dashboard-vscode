@@ -3,7 +3,7 @@ import fs from "fs/promises";
 import { walkHelper } from "./walk";
 import path from "path";
 import { GlobalStateDirs } from "./GlobalStateDirs";
-import { MAX_PROJECTS_IN_A_DIR } from "./extension";
+import { MAX_PROJECTS_IN_A_DIR } from "./constants";
 
 // dirs = {
 // 	'C:\projs': {

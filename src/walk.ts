@@ -1,5 +1,10 @@
 import path from "path";
 import fs from "fs/promises";
+import {
+  ACCEPT_EXTS,
+  IGNORE_FOLDERS,
+  MAX_DIRENTS_TO_LOOP_OVER,
+} from "./constants";
 
 // sub-files check
 export async function walkHelper(itemPath: string, depth = 4) {
@@ -46,7 +51,20 @@ export async function walkHelper(itemPath: string, depth = 4) {
             framework = "next";
           } else if (direntNames.has("angular.json")) {
             framework = "angular";
+          } else if (
+            direntNames.has("astro.config.mjs") ||
+            direntNames.has("astro.config.js") ||
+            direntNames.has("astro.config.ts")
+          ) {
+            framework = "astro";
+          } else if (
+            direntNames.has("nuxt.config.ts") ||
+            direntNames.has("nuxt.config.js") ||
+            direntNames.has("nuxt.config.mjs")
+          ) {
+            framework = "nuxt";
           }
+
           if (direntNames.has("tsconfig.json")) isTypescriptApp = true; // fallback
         } else if (direntNames.has("composer.json")) {
           if (direntNames.has("artisan") && direntNames.has("vendor")) {
@@ -64,9 +82,10 @@ export async function walkHelper(itemPath: string, depth = 4) {
           framework = "svelte";
         }
       }
-      for (let dirent of dirents.slice(0, 15)) {
+
+      for (let dirent of dirents.slice(0, MAX_DIRENTS_TO_LOOP_OVER)) {
         if (dirent.isFile()) {
-          const ext = path.extname(dirent.name);
+          const ext = path.extname(dirent.name).toLowerCase();
           if (shouldIgnoreFile(dirent.name, ext, gitIgnoreSet)) continue;
           // console.log("-> ", dirent.name);
           extDist[ext] = (extDist[ext] || 0) + 1;
@@ -114,7 +133,7 @@ export async function walkHelper(itemPath: string, depth = 4) {
       else if (extDist[".dart"] > 40) framework = "flutter";
       else if (extDist[".kt"] > 20 || extDist[".kts"] > 20)
         framework = "flutter";
-      else if (extDist['.py'] > 20) framework = "python";
+      else if (extDist[".py"] > 20) framework = "python";
     }
   }
 
@@ -132,7 +151,7 @@ function shouldIgnoreFile(
     direntName.endsWith(".config.ts") ||
     direntName.endsWith(".config.js") ||
     direntName.endsWith(".config.mjs") ||
-    !acceptExts.has(ext) ||
+    !ACCEPT_EXTS.has(ext) ||
     isGitIgnored(gitIgnoreSet, direntName)
   );
 }
@@ -140,7 +159,7 @@ function shouldIgnoreFile(
 function shouldIgnoreFolder(direntName: string, gitIgnoreSet: Set<string>) {
   return (
     direntName.startsWith(".") ||
-    ignoreFolders.has(direntName) ||
+    IGNORE_FOLDERS.has(direntName) ||
     isGitIgnored(gitIgnoreSet, direntName)
   );
 }
@@ -151,71 +170,3 @@ function isGitIgnored(gitIgnoreSet: Set<string>, dirent: string) {
 }
 
 // walkHelper("C:\\Users\\DC\\codes\\flights", 4).then((a) => console.log(a));
-
-// todo: optimize
-// todo: for py library folder, depth is insufficient
-
-const ignoreFolders = new Set([
-  "venv",
-  "node_modules",
-  "build",
-  "dist",
-  "out",
-  "target",
-  "vendor",
-  "env",
-  "dist",
-  "tmp",
-  "__pycache__",
-  "bin",
-  "obj",
-  // ".next",
-  // ".git",
-  // ".venv",
-  // ".vscode",
-  // ".idea",
-]);
-
-const acceptExts = new Set([
-  ".html",
-  ".css",
-  ".js",
-  ".jsx",
-  ".ts",
-  ".tsx",
-  ".cjs",
-  ".mjs",
-  ".mts",
-  ".cts",
-  ".py",
-  ".pyi",
-  ".java",
-  ".groovy",
-  ".c",
-  ".cpp",
-  ".cc",
-  ".cxx",
-  ".h",
-  ".hpp",
-  ".hh",
-  ".hxx",
-  ".cs",
-  ".go",
-  ".rs",
-  ".php",
-  ".phtml",
-  ".rb",
-  ".rake",
-  ".swift",
-  ".kt",
-  ".kts",
-  ".sh",
-  ".bash",
-  ".zsh",
-  ".bat",
-  ".cmd",
-  ".asm",
-  ".s",
-  ".r",
-  ".R",
-]);

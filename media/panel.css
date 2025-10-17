@@ -204,7 +204,7 @@ button {
             background: #3178c6;
           }
 
-          &.py {
+          &.py, &.pyi {
             background: #3776ab;
           }
 

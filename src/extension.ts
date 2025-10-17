@@ -30,5 +30,4 @@ export const genNonce = () => {
   return Math.ceil(Math.random() * 1234213438).toString();
 };
 
-export const MAX_PROJECTS_IN_A_DIR = 60;
-export const MAX_LANGUAGES_TO_SHOW = 10;
+
