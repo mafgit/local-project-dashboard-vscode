@@ -3,6 +3,7 @@ import fs from "fs/promises";
 import { walkHelper } from "./walk";
 import path from "path";
 import { GlobalStateDirs } from "./GlobalStateDirs";
+import { MAX_PROJECTS_IN_A_DIR } from "./extension";
 
 // dirs = {
 // 	'C:\projs': {
@@ -26,7 +27,6 @@ export async function refreshProjects(context: vscode.ExtensionContext) {
       const newDirs: GlobalStateDirs = {};
 
       console.log(Object.keys(oldDirs));
-      
 
       for (const baseDir of Object.keys(oldDirs)) {
         try {
@@ -34,14 +34,23 @@ export async function refreshProjects(context: vscode.ExtensionContext) {
 
           newDirs[baseDir] = {};
 
-          for (let proj of projects) {
+          for (
+            let i = 0;
+            i < Math.min(projects.length, MAX_PROJECTS_IN_A_DIR);
+            i++
+          ) {
+            const proj = projects[i];
             const itemPath = path.join(baseDir, proj);
             // console.log(' -- ', itemPath);
 
             const stats = await fs.stat(itemPath);
 
-            if (stats.isDirectory() && !proj.startsWith(".")) {
-              const extDist = await walkHelper(itemPath, 4);
+            if (
+              stats.isDirectory() &&
+              !proj.startsWith(".") &&
+              proj !== "node_modules"
+            ) {
+              const { extDist, framework } = await walkHelper(itemPath, 4);
 
               let starred = false;
 
@@ -52,6 +61,7 @@ export async function refreshProjects(context: vscode.ExtensionContext) {
               const projectDiscovered = {
                 languages: extDist,
                 starred,
+                framework,
               };
 
               newDirs[baseDir][proj] = projectDiscovered;

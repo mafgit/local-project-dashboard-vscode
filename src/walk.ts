@@ -7,6 +7,13 @@ export async function walkHelper(itemPath: string, depth = 4) {
   let totalCount = 0;
   const gitIgnoreSet = new Set<string>(); // todo: ...
 
+  let framework = "";
+
+  let isNodeApp = false;
+  let isPythonApp = false;
+  let isTypescriptApp = false;
+  let isNextApp = false;
+
   async function walk(itemPath: string, depth: number) {
     if (depth <= 1) return;
 
@@ -14,7 +21,50 @@ export async function walkHelper(itemPath: string, depth = 4) {
       const dirents = await fs.readdir(itemPath, {
         withFileTypes: true,
       });
-      for (let dirent of dirents) {
+
+      if (!framework) {
+        const direntNames = new Set(dirents.map((d) => d.name));
+
+        if (direntNames.has("pubspec.yaml")) {
+          framework = "flutter";
+        } else if (direntNames.has("build.gradle.kts")) {
+          framework = "kotlin";
+        } else if (
+          direntNames.has("build.gradle") ||
+          direntNames.has("pom.xml")
+        ) {
+          framework = "java";
+        } else if (direntNames.has("package.json")) {
+          isNodeApp = true; // fallback
+
+          if (
+            direntNames.has("next.config.js") ||
+            direntNames.has("next.config.ts") ||
+            direntNames.has("next.config.mjs")
+          ) {
+            isNextApp = true;
+            framework = "next";
+          } else if (direntNames.has("angular.json")) {
+            framework = "angular";
+          }
+          if (direntNames.has("tsconfig.json")) isTypescriptApp = true; // fallback
+        } else if (direntNames.has("composer.json")) {
+          if (direntNames.has("artisan") && direntNames.has("vendor")) {
+            framework = "laravel";
+          } else {
+            framework = "php";
+          }
+        } else if (
+          direntNames.has("pyproject.toml") ||
+          direntNames.has("requirements.txt")
+        ) {
+          isPythonApp = true;
+          framework = "python";
+        } else if (direntNames.has("svelte.config.js")) {
+          framework = "svelte";
+        }
+      }
+      for (let dirent of dirents.slice(0, 15)) {
         if (dirent.isFile()) {
           const ext = path.extname(dirent.name);
           if (shouldIgnoreFile(dirent.name, ext, gitIgnoreSet)) continue;
@@ -41,7 +91,34 @@ export async function walkHelper(itemPath: string, depth = 4) {
   Object.entries(extDist).forEach(([key, value]) => {
     extDist[key] = totalCount > 0 ? (value * 100) / totalCount : 0;
   });
-  return extDist;
+
+  if (!framework) {
+    if (isNodeApp && extDist[".vue"] > 20) framework = "vue";
+    else if (
+      isNodeApp &&
+      !isNextApp &&
+      (extDist[".jsx"] > 10 || extDist[".tsx"] > 10)
+    )
+      framework = "react";
+    else if (extDist[".html"] > 40) framework = "html";
+    else if (extDist[".css"] > 40) framework = "css";
+    else if (isNodeApp) framework = "node";
+    else {
+      if (isTypescriptApp && extDist[".ts"] > 40) framework = "typescript";
+      else if (!isTypescriptApp && extDist[".js"] > 40)
+        framework = "javascript";
+      else if (extDist[".c"] > 40 || extDist[".h"] > 40) framework = "c";
+      else if (extDist[".cpp"] > 40) framework = "cpp";
+      else if (extDist[".cs"] > 40 || extDist[".csproj"] > 40) framework = "cs";
+      else if (extDist[".java"] > 40) framework = "java";
+      else if (extDist[".dart"] > 40) framework = "flutter";
+      else if (extDist[".kt"] > 20 || extDist[".kts"] > 20)
+        framework = "flutter";
+      else if (extDist['.py'] > 20) framework = "python";
+    }
+  }
+
+  return { extDist, framework };
 }
 
 function shouldIgnoreFile(
@@ -87,6 +164,8 @@ const ignoreFolders = new Set([
   "target",
   "vendor",
   "env",
+  "dist",
+  "tmp",
   "__pycache__",
   "bin",
   "obj",

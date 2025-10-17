@@ -4,6 +4,7 @@ export type GlobalStateDirs = Record<
     string, {
       languages: Record<string, number>;
       starred: boolean;
+      framework: string;
     }
   >
 >;

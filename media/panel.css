@@ -121,7 +121,7 @@ button {
         display: flex;
         justify-content: center;
         align-items: center;
-        gap: 5px;
+        gap: 7px;
 
         .project-icon {
           border-radius: 4px !important;
