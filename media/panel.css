@@ -116,11 +116,16 @@ button {
       justify-content: space-between;
       align-items: center;
 
+      
       .project-head-heading {
         display: flex;
         justify-content: center;
         align-items: center;
         gap: 5px;
+
+        .project-icon {
+          border-radius: 4px !important;
+        }
       }
 
       .project-btns {
