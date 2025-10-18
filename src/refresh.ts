@@ -17,7 +17,7 @@ export async function refreshProjects(context: vscode.ExtensionContext) {
   await vscode.window.withProgress(
     {
       location: vscode.ProgressLocation.Notification,
-      title: "LocalHub — Refreshing project directories. May take a while.",
+      title: "Local Project Hub — Refreshing project directories. May take a while.",
       cancellable: true,
     },
     async (progress, token) => {

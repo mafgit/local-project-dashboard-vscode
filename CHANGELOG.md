@@ -9,6 +9,8 @@
 - Transitions in panel such as show and hide section
 - Optimize HTML rendering for starred and adding/removing and other things
 
-## [Unreleased]
-
+[0.0.1]
 - Initial release
+
+[0.0.2]
+- Title change

@@ -15,7 +15,7 @@ export function showProjectsPanel(context: vscode.ExtensionContext) {
 
   panel = vscode.window.createWebviewPanel(
     "localProjectOpenerWebview",
-    "LocalHub — Project Explorer",
+    "Local Project Hub",
     vscode.ViewColumn.One,
     {
       retainContextWhenHidden: true,
@@ -107,11 +107,11 @@ export function getWebviewPanelHTML(cspSource: string, baseUri: string) {
     <meta charset="UTF-8" />
     <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src ${cspSource}; style-src ${cspSource} 'unsafe-inline'; script-src 'nonce-${nonce}';
 ">
-    <title>LocalHub — Project Explorer</title>
+    <title>Local Project Hub</title>
     <link rel="stylesheet" href="${baseUri + "/panel.css"}" />
   </head>
   <body>
-    <h1 class="top-heading">LocalHub</h1>
+    <h1 class="top-heading">Local Project Hub — Project Dashboard</h1>
 
     <p class="msg-1">No project found. From sidebar, add directory wherein your projects live directly, then click load.</p>
 

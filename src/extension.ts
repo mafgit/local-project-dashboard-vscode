@@ -4,7 +4,7 @@ import { showProjectsPanel } from "./panel";
 import { SidebarProvider } from "./sidebar";
 
 export async function activate(context: vscode.ExtensionContext) {
-  console.log("Welcome to LocalHub — Project Explorer!");
+  console.log("Welcome to Local Project Hub — Project Dashboard!");
 
   const disposable1 = vscode.commands.registerCommand(
     "localhub.refreshProjects",
