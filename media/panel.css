@@ -99,7 +99,7 @@ button {
 
 .projects {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
   gap: 10px;
 
   .project {
@@ -185,6 +185,10 @@ button {
           &.html,
           &.xml {
             background: #e34c26;
+          }
+
+          &.vue {
+            background: #42b883;
           }
 
           &.css,
@@ -280,6 +284,12 @@ button {
     color: var(--open-btn-color);
     padding: 5px 10px;
     border-radius: 8px;
+  }
+}
+
+@media screen and (max-width: 1400px) {
+  .projects {
+    grid-template-columns: 1fr 1fr 1fr;
   }
 }
 

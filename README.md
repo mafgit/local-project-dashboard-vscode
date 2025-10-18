@@ -3,7 +3,7 @@
 **Effortlessly manage all your local projects in one modern, sleek dashboard — right inside VS Code.**
 No more manually browsing folders or reopening recent projects.
 
-![https://ibb.co/R4GWp5Pm](https://i.ibb.co/CspF5rvZ/Screenshot-2025-10-03-160615.png)
+[![ss](https://i.ibb.co/GvvsG0zS/ss.jpg)](https://ibb.co/xSSmwDxT)
 
 ## 🚀 Features
 
