@@ -1,6 +1,6 @@
 # Local Project Dashboard
 
-[![Version](https://vsmarketplacebadges.dev/version/mafgit.localhub.svg)](https://marketplace.visualstudio.com/items?itemName=mafgit.localhub) [![Installs](https://vsmarketplacebadges.dev/installs/mafgit.localhub.svg)](https://marketplace.visualstudio.com/items?itemName=mafgit.localhub) [![Rating](https://vsmarketplacebadges.dev/rating/mafgit.localhub.svg)](https://marketplace.visualstudio.com/items?itemName=mafgit.localhub) [![GitHub Stars](https://img.shields.io/github/stars/mafgit/local-project-dashboard-vscode?style=social)](https://github.com/mafgit/local-project-dashboard-vscode/stargazers)
+<!-- [![Version](https://vsmarketplacebadges.dev/version/mafgit.localhub.svg)](https://marketplace.visualstudio.com/items?itemName=mafgit.localhub) [![Installs](https://vsmarketplacebadges.dev/installs/mafgit.localhub.svg)](https://marketplace.visualstudio.com/items?itemName=mafgit.localhub) [![Rating](https://vsmarketplacebadges.dev/rating/mafgit.localhub.svg)](https://marketplace.visualstudio.com/items?itemName=mafgit.localhub) [![GitHub Stars](https://img.shields.io/github/stars/mafgit/local-project-dashboard-vscode?style=social)](https://github.com/mafgit/local-project-dashboard-vscode/stargazers) -->
 
 **Effortlessly manage all your local projects in one modern, sleek dashboard — right inside VS Code.**
 No more manually browsing folders or reopening recent projects.
