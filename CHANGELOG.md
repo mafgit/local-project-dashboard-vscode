@@ -1,10 +1,15 @@
 # Changelog
 
 ## [Tentative]
+- Themes
 - Allow sorting up and down of sections
 - Edit folder name
 - Optimize directory scanning
 - Optimize HTML rendering for starred and adding/removing and other things
+
+## [0.1.1] - 29th May, 2026
+- Font changed
+- Style fixes
 
 ## [0.1.0] - 29th May, 2026
 - Project searching

@@ -138,9 +138,10 @@ export class MySidebarProvider implements vscode.WebviewViewProvider {
 
         &.remove-btn {
           font-size: 16px;
-          width: 18px;
-          height: 18px;
+          width: 10px;
+          height: 10px;
           padding: 0;
+          border-radius: 50%;
           display: flex;
           justify-content: center;
           align-items: center;
@@ -284,7 +285,7 @@ export class MySidebarProvider implements vscode.WebviewViewProvider {
         p.textContent = dir;
         
         const button = document.createElement("button");
-        button.textContent = "−";
+        // button.textContent = "";
         button.className = "remove-btn";
         button.onclick = () => {
           vscode.postMessage({ name: "removeDirectory", data: dir });

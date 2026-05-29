@@ -135,7 +135,7 @@ export default class MyPanel {
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src ${cspSource}; style-src ${cspSource} 'unsafe-inline'; script-src 'nonce-${nonce}';
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; font-src ${cspSource}; img-src ${cspSource}; style-src ${cspSource} 'unsafe-inline'; script-src 'nonce-${nonce}';
 ">
     <title>Local Project Dashboard</title>
     <link rel="stylesheet" href="${baseUri + "/panel.css"}" />
@@ -153,7 +153,7 @@ export default class MyPanel {
 
     <section class="projects-section" id="starred-section">
       <div class="section-top">
-        <h2 class="section-heading">Starred</h2>
+        <h2 class="section-heading">⭐ Starred</h2>
       </div>
       <p class="msg-2">No starred project found.</p>
       <div class="projects-wrapper">

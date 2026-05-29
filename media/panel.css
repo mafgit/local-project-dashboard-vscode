@@ -19,7 +19,7 @@ body.vscode-light {
 }
 
 ::-webkit-scrollbar {
-    display: none;
+	display: none;
 }
 
 * {
@@ -32,30 +32,57 @@ body {
 	/* font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif; */
 	padding: 30px;
 	display: flex;
-	gap: 30px;
+	gap: 15px;
 	flex-direction: column;
 }
 
+@font-face {
+	font-family: "Poppins";
+	src: url("./poppins-300.woff2") format("woff2");
+	font-weight: 300;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Poppins";
+	src: url("./poppins-regular.woff2") format("woff2");
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Poppins";
+	src: url("./poppins-700.woff2") format("woff2");
+	font-weight: 700;
+	font-style: normal;
+	font-display: swap;
+}
 
 html,
 body {
 	scroll-behavior: smooth;
 	-webkit-font-smoothing: antialiased;
-    -ms-overflow-style: none;
-    scrollbar-width: none;
+	-ms-overflow-style: none;
+	scrollbar-width: none;
+	font-family: "Poppins", var(--vscode-font-family), system-ui, sans-serif;
+	font-style: normal;
+	font-weight: 300;
 }
 
 #search-proj-input {
-	border-radius: 10px;
-	padding: 10px;
+	border-radius: 30px;
+	padding: 10px 13px;
 	background: var(--proj-bg);
-	border-radius: 10px;
-	margin: 0 auto;
+	margin: 0 auto 10px auto;
 	width: 60%;
 	max-width: 600px;
 	color: var(--vscode-foreground);
 	border: 1px solid var(--proj-border-color);
-	transition: width 0.3s ease-out, max-width 0.3s ease-out;
+	transition:
+		width 0.3s ease-out,
+		max-width 0.3s ease-out;
 }
 
 #search-proj-input:focus {
@@ -138,10 +165,10 @@ button {
 
 		.section-heading {
 			color: var(--section-heading-color);
-			font-style: italic;
+			/* font-style: italic; */
 			font-weight: normal;
 			border-radius: 5px;
-			padding: 5px 8px;
+			padding: 5px 10px;
 			width: max-content;
 			border: 1px solid #535353a8;
 			font-size: 0.8rem !important;
@@ -150,13 +177,15 @@ button {
 }
 
 .projects-wrapper {
-    display: grid;
+	display: grid;
 	grid-template-rows: 1fr;
-	transition: grid-template-rows 0.3s ease-out, opacity 0.3s ease-out;
+	transition:
+		grid-template-rows 0.3s ease-out,
+		opacity 0.6s ease-out;
 
 	&.collapsed {
 		grid-template-rows: 0fr;
-        opacity: 0;
+		opacity: 0;
 	}
 
 	.projects {
@@ -352,7 +381,7 @@ button {
 	}
 }
 
-@media screen and (max-width: 1400px) {
+@media screen and (max-width: 1200px) {
 	.projects {
 		grid-template-columns: 1fr 1fr 1fr !important;
 	}
