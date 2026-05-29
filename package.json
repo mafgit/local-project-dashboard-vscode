@@ -1,89 +1,104 @@
 {
-  "name": "localhub",
-  "displayName": "Local Project Hub — Project Dashboard",
-  "keywords": [
-    "project",
-    "explorer",
-    "viewer",
-    "opener",
-    "dashboard",
-    "organizer",
-    "opener",
-    "manager",
-    "local",
-    "hub"
-  ],
-  "description": "View all projects in one place & open any project in a new tab without having to open it from explorer",
-  "version": "0.0.2",
-  "license": "MIT",
-  "icon": "media/icon.png",
-  "activationEvents": [],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/mafgit/local-project-hub-vscode"
-  },
-  "publisher": "mafgit",
-  "author": {
-    "name": "mafgit",
-    "url": "https://github.com/mafgit"
-  },
-  "homepage": "https://github.com/mafgit/local-project-hub-vscode",
-  "engines": {
-    "vscode": "^1.104.0"
-  },
-  "categories": [
-    "Visualization",
-    "Other"
-  ],
-  "main": "./out/extension.js",
-  "contributes": {
-    "commands": [
-      {
-        "command": "localhub.refreshProjects",
-        "title": "Refresh Projects"
-      },
-      {
-        "command": "localhub.showProjectsPanel",
-        "title": "Show Projects"
-      }
-    ],
-    "viewsContainers": {
-      "activitybar": [
-        {
-          "id": "sidebarViewContainer",
-          "title": "Local Project Hub — Project Explorer",
-          "icon": "media/icon.svg"
-        }
-      ]
-    },
-    "views": {
-      "sidebarViewContainer": [
-        {
-          "type": "webview",
-          "id": "sidebarView",
-          "name": "Local Project Hub — Project Explorer",
-          "icon": "media/icon.svg"
-        }
-      ]
-    }
-  },
-  "scripts": {
-    "vscode:prepublish": "npm run compile",
-    "compile": "tsc -p ./",
-    "watch": "tsc -watch -p ./",
-    "pretest": "npm run compile && npm run lint",
-    "lint": "eslint src",
-    "test": "vscode-test"
-  },
-  "devDependencies": {
-    "@types/vscode": "^1.104.0",
-    "@types/mocha": "^10.0.10",
-    "@types/node": "22.x",
-    "@typescript-eslint/eslint-plugin": "^8.42.0",
-    "@typescript-eslint/parser": "^8.42.0",
-    "eslint": "^9.34.0",
-    "typescript": "^5.9.2",
-    "@vscode/test-cli": "^0.0.11",
-    "@vscode/test-electron": "^2.5.2"
-  }
+	"name": "localhub",
+	"displayName": "Local Project Dashboard",
+	"keywords": [
+		"project",
+		"explorer",
+		"viewer",
+		"opener",
+		"dashboard",
+		"organizer",
+		"opener",
+		"manager",
+		"local",
+		"hub"
+	],
+	"description": "View all projects in one place & open any project in a new tab without having to open it from explorer",
+	"version": "0.1.0",
+	"license": "MIT",
+	"icon": "media/icon.png",
+	"activationEvents": [
+		"*"
+	],
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/mafgit/local-project-dashboard-vscode"
+	},
+	"publisher": "mafgit",
+	"author": {
+		"name": "mafgit",
+		"url": "https://github.com/mafgit"
+	},
+	"homepage": "https://github.com/mafgit/local-project-dashboard-vscode",
+	"engines": {
+		"vscode": "^1.104.0"
+	},
+	"categories": [
+		"Visualization",
+		"Other"
+	],
+	"main": "./out/extension.js",
+	"contributes": {
+		"commands": [
+			{
+				"command": "localProjectDashboard.refreshProjects",
+				"title": "Refresh Projects"
+			},
+			{
+				"command": "localProjectDashboard.showProjectsPanel",
+				"title": "Show Projects"
+			}
+		],
+		"viewsContainers": {
+			"activitybar": [
+				{
+					"id": "sidebarViewContainer",
+					"title": "Local Project Dashboard",
+					"icon": "media/icon.svg"
+				}
+			]
+		},
+		"views": {
+			"sidebarViewContainer": [
+				{
+					"type": "webview",
+					"id": "localProjectDashboard.sidebarView",
+					"name": "Local Project Dashboard",
+					"icon": "media/icon.svg"
+				}
+			]
+		},
+		"configuration": {
+			"title": "Local Project Dashboard",
+			"properties": {
+				"localProjectDashboard.showOnStartup": {
+					"type": "boolean",
+					"default": true,
+					"description": "Automatically open the dashboard every time VS Code starts."
+				}
+			}
+		}
+	},
+	"scripts": {
+		"vscode:prepublish": "npm run compile",
+		"compile": "tsc -p ./",
+		"watch": "tsc -watch -p ./",
+		"pretest": "npm run compile && npm run lint",
+		"lint": "eslint src",
+		"test": "vscode-test"
+	},
+	"devDependencies": {
+		"@types/vscode": "^1.104.0",
+		"@types/mocha": "^10.0.10",
+		"@types/node": "22.x",
+		"@typescript-eslint/eslint-plugin": "^8.42.0",
+		"@typescript-eslint/parser": "^8.42.0",
+		"eslint": "^9.34.0",
+		"typescript": "^5.9.2",
+		"@vscode/test-cli": "^0.0.11",
+		"@vscode/test-electron": "^2.5.2"
+	},
+	"overrides": {
+		"serialize-javascript": "^7.0.5"
+	}
 }

@@ -14,67 +14,88 @@ import { MAX_PROJECTS_IN_A_DIR } from "./constants";
 // }
 
 export async function refreshProjects(context: vscode.ExtensionContext) {
-  await vscode.window.withProgress(
-    {
-      location: vscode.ProgressLocation.Notification,
-      title: "Local Project Hub — Refreshing project directories. May take a while.",
-      cancellable: true,
-    },
-    async (progress, token) => {
-      progress.report({ increment: 0, message: "..." });
+	const oldDirs = context.globalState.get<GlobalStateDirs>("dirs", {});
+	const newDirs: GlobalStateDirs = {};
 
-      const oldDirs = context.globalState.get<GlobalStateDirs>("dirs", {});
-      const newDirs: GlobalStateDirs = {};
+	const oldDirsArr = Object.keys(oldDirs);
+	const oldDirsArrLength = oldDirsArr.length;
 
-      console.log(Object.keys(oldDirs));
+	if (oldDirsArrLength === 0) {
+		vscode.window.showWarningMessage(
+			"You haven't added any base directory yet.",
+		);
 
-      for (const baseDir of Object.keys(oldDirs)) {
-        try {
-          const projects = await fs.readdir(baseDir);
+		return;
+	}
 
-          newDirs[baseDir] = {};
+	await vscode.window.withProgress(
+		{
+			location: vscode.ProgressLocation.Notification,
+			title: "Scanning",
+			cancellable: true,
+		},
+		async (progress, token) => {
+			for (let d = 0; d < oldDirsArrLength; d++) {
+				const baseDir = oldDirsArr[d];
 
-          for (
-            let i = 0;
-            i < Math.min(projects.length, MAX_PROJECTS_IN_A_DIR);
-            i++
-          ) {
-            const proj = projects[i];
-            const itemPath = path.join(baseDir, proj);
-            // console.log(' -- ', itemPath);
+				try {
+					progress.report({
+						message: "..." + baseDir.slice(-30),
+					});
+					const projects = await fs.readdir(baseDir);
 
-            const stats = await fs.stat(itemPath);
+					newDirs[baseDir] = {};
 
-            if (
-              stats.isDirectory() &&
-              !proj.startsWith(".") &&
-              proj !== "node_modules"
-            ) {
-              const { extDist, framework } = await walkHelper(itemPath, 4);
+					for (
+						let i = 0;
+						i < Math.min(projects.length, MAX_PROJECTS_IN_A_DIR);
+						i++
+					) {
+						const proj = projects[i];
+						const itemPath = path.join(baseDir, proj);
+						// console.log(' -- ', itemPath);
 
-              let starred = false;
+						const stats = await fs.stat(itemPath);
 
-              if (oldDirs[baseDir][proj]) {
-                starred = oldDirs[baseDir][proj].starred;
-              }
+						if (
+							stats.isDirectory() &&
+							!proj.startsWith(".") &&
+							proj !== "node_modules"
+						) {
+							const { extDist, framework } = await walkHelper(
+								itemPath,
+								4,
+							);
 
-              const projectDiscovered = {
-                languages: extDist,
-                starred,
-                framework,
-              };
+							let starred = false;
 
-              newDirs[baseDir][proj] = projectDiscovered;
-            }
-          }
-        } catch (err: any) {
-          console.log(err); // err.code == 'ENOENT' means baseDir isn't actually available (i.e. was deleted by user in his PC)
-        }
-      }
+							if (oldDirs[baseDir][proj]) {
+								starred = oldDirs[baseDir][proj].starred;
+							}
 
-      await context.globalState.update("dirs", newDirs);
+							const projectDiscovered = {
+								languages: extDist,
+								starred,
+								framework,
+							};
 
-      progress.report({ increment: 100, message: "Done!" });
-    }
-  );
+							newDirs[baseDir][proj] = projectDiscovered;
+						}
+					}
+
+					progress.report({
+						increment: Math.ceil(100 / oldDirsArrLength),
+					});
+				} catch (err: any) {
+					console.error(err); // err.code == 'ENOENT' means baseDir isn't actually available (i.e. was deleted by user in his PC)
+					// already handled (will be removed, due to old and new dirs logic)
+				}
+			}
+
+			await context.globalState.update("dirs", newDirs);
+
+			// progress.report({ increment: 100, message: "Done" });
+			vscode.window.showInformationMessage("Scanning Completed!");
+		},
+	);
 }
