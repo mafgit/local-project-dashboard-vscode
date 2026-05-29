@@ -55,7 +55,7 @@ body {
 	max-width: 600px;
 	color: var(--vscode-foreground);
 	border: 1px solid var(--proj-border-color);
-	transition: width 0.3s;
+	transition: width 0.3s ease-out, max-width 0.3s ease-out;
 }
 
 #search-proj-input:focus {
@@ -354,18 +354,18 @@ button {
 
 @media screen and (max-width: 1400px) {
 	.projects {
-		grid-template-columns: 1fr 1fr 1fr;
+		grid-template-columns: 1fr 1fr 1fr !important;
 	}
 }
 
 @media screen and (max-width: 768px) {
 	.projects {
-		grid-template-columns: 1fr 1fr;
+		grid-template-columns: 1fr 1fr !important;
 	}
 }
 
 @media screen and (max-width: 400px) {
 	.projects {
-		grid-template-columns: 1fr;
+		grid-template-columns: 1fr !important;
 	}
 }
