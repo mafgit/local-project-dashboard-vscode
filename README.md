@@ -17,7 +17,7 @@ No more manually browsing folders or reopening recent projects.
 - ⚡ **Smart Scanning**: Add one or more base directories, and it will scan their immediate child folders for projects
 - 🔄 **Refresh Anytime**: Just click Scan/Refresh to update your project list
 - 🔎 **Search Projects**
-- 🔎 **Show on Startup (Optional)**
+- 🚀 **Show on Startup (Optional)**
 
 ## ℹ️ Usage
 
