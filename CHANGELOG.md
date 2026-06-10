@@ -3,9 +3,14 @@
 ## [Tentative]
 - Themes
 - Allow sorting up and down of sections
+- Delete folder
 - Edit folder name
 - Optimize directory scanning
-- Optimize HTML rendering for starred and adding/removing and other things
+
+## [0.1.2] - 11th Jun, 2026
+- Create new project from right inside panel
+- Rerendering on toggling star issue fixed
+- Click on base directory in panel to open it in explorer
 
 ## [0.1.1] - 29th May, 2026
 - Font changed

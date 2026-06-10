@@ -42,7 +42,7 @@ export class MySidebarProvider implements vscode.WebviewViewProvider {
 
 		this.view.webview.onDidReceiveMessage(
 			async ({ name, data }: { name: string; data: any }) => {
-				console.debug(`\n========== ${name} received`, data, "\n");
+				console.debug(`\nSidebar Message "${name}" received with data: `, data, "\n");
 				if (name === "addDirectory") {
 					const result = await vscode.window.showOpenDialog({
 						canSelectFiles: false,

@@ -67,24 +67,83 @@ export default class MyPanel {
 			baseUri,
 		);
 
-		this.sendUpdateMessageToPanelUI(context, this.panel);
+		// send global state load message
+		const dirs: GlobalStateDirs = context.globalState.get("dirs", {});
+		if (dirs) {
+			this.panel?.webview.postMessage({
+				name: "globalStateLoad",
+				data: dirs,
+			});
+		} // todo: do this when asked by html through msg?
 
 		// receive message
 		this.panel.webview.onDidReceiveMessage(
 			async ({ name, data }: { name: string; data: any }) => {
 				try {
+					console.debug(
+						`\nPanel Message "${name}" received with data: `,
+						data,
+						"\n",
+					);
 					if (name === "openProject") {
+						const uri = vscode.Uri.file(path.join(...data));
+
 						await vscode.commands.executeCommand(
 							"vscode.openFolder",
-							vscode.Uri.file(path.join(...data)),
+							uri,
 							{
 								forceNewWindow: true,
 							},
 						);
 					} else if (name === "openFolder") {
-						await vscode.env.openExternal(
-							vscode.Uri.file(path.join(...data)),
-						);
+						const uri = vscode.Uri.file(path.join(...data));
+						await vscode.env.openExternal(uri);
+					} else if (name === "createFolder") {
+						const base = data[0];
+
+						const input = await vscode.window.showInputBox({
+							title: "Create folder",
+							placeHolder: "e.g. my-calculator-app",
+							prompt: 'Creating folder inside "' + base + '"',
+						});
+
+						if (!input) return;
+						try {
+							const uri = vscode.Uri.file(path.join(base, input));
+							await vscode.workspace.fs.createDirectory(uri);
+							// add to global state
+							const dirs =
+								context.globalState.get<GlobalStateDirs>(
+									"dirs",
+									{},
+								);
+
+							await context.globalState.update("dirs", {
+								...dirs,
+								[base]: {
+									...dirs[base],
+									[input]: {
+										languages: {},
+										framework: "",
+										starred: false,
+									},
+								},
+							});
+
+							await panel?.webview.postMessage({
+								name: "folderCreated",
+								data: [base, input],
+							});
+
+							vscode.window.showInformationMessage(
+								"Folder creation successful",
+							);
+						} catch (err) {
+							console.error(err);
+							await vscode.window.showErrorMessage(
+								"Error creating folder",
+							);
+						}
 					} else if (name === "toggleStar") {
 						const dirs = context.globalState.get<GlobalStateDirs>(
 							"dirs",
@@ -93,7 +152,7 @@ export default class MyPanel {
 						const [base, proj] = data as [string, string];
 						if (!dirs[base] || !dirs[base][proj]) return;
 
-						const starred = dirs[base][proj].starred;
+						const wasStarred = dirs[base][proj].starred;
 
 						await context.globalState.update("dirs", {
 							...dirs,
@@ -101,31 +160,22 @@ export default class MyPanel {
 								...dirs[base],
 								[proj]: {
 									...dirs[base][proj],
-									starred: !starred,
+									starred: !wasStarred,
 								},
 							},
 						});
 
-						this.sendUpdateMessageToPanelUI(context, this.panel);
+						await panel?.webview.postMessage({
+							name: "starToggled",
+							data: [base, proj, !wasStarred],
+						});
 					}
 				} catch (err: any) {
+					vscode.window.showErrorMessage("An error occurred");
 					console.error(err);
 				}
 			},
 		);
-	}
-
-	private sendUpdateMessageToPanelUI(
-		context: vscode.ExtensionContext,
-		panel: vscode.WebviewPanel | undefined,
-	) {
-		const dirs: GlobalStateDirs = context.globalState.get("dirs", {});
-		if (dirs) {
-			panel?.webview.postMessage({
-				name: "globalStateLoad",
-				data: dirs,
-			});
-		}
 	}
 
 	public getWebviewPanelHTML(cspSource: string, baseUri: string) {
@@ -153,14 +203,15 @@ export default class MyPanel {
 
     <section class="projects-section" id="starred-section">
       <div class="section-top">
-        <h2 class="section-heading">⭐ Starred</h2>
+        <h2 class="section-heading starred-section-heading">⭐ Starred</h2>
+        <div class="section-top-btns"></div>
       </div>
       <p class="msg-2">No starred project found.</p>
       <div class="projects-wrapper">
         <div class="projects"></div>
       </div>
     </section>
-    
+
     <main id="project-sections-container">
     </main>
     
@@ -170,13 +221,55 @@ export default class MyPanel {
         const projectSectionsContainer = document.getElementById("project-sections-container")
         const starredProjectsDiv = document.querySelector('#starred-section .projects')
 
-        let loadedData = [] // to reuse for both globalStateLoad and search filtering
+        let loadedData = {} // to reuse for both globalStateLoad and search filtering
 
         window.addEventListener("message", ({ data: { name, data } }) => {
-            // console.log(name, data)
-            if (name === 'globalStateLoad') {
-                loadedData = data
-                createProjectsUI()
+            console.log(\`Panel Message "\${name}" with data:\`, data)
+            try {
+                // ----------------------------------------------
+                if (name === 'globalStateLoad') {
+                    loadedData = data
+                    createProjectsUI()
+                }
+
+                // ----------------------------------------------
+                else if (name === "starToggled") {
+                    const [base, proj, isStarred] = data
+                    loadedData[base][proj].starred = isStarred
+                    const project = loadedData[base][proj]
+
+                    // toggle starred class of original
+                    const originalProjectArticle = document.querySelector(\`.projects-section[data-dir="\${CSS.escape(base)}"] .project[data-proj="\${CSS.escape(proj)}"]\`)
+                    if (originalProjectArticle) {
+                        originalProjectArticle.querySelector('.project-star-btn').classList.toggle('starred')
+                        
+                        if (isStarred) {
+                            // new project article to add in starred section
+                            const projectArticle = makeProjectArticle(project, base, proj)
+                            starredProjectsDiv.prepend(projectArticle)
+                        } else {
+                            // remove from starred section
+                            starredProjectsDiv.querySelector(\`.project[data-proj="\${CSS.escape(proj)}"][data-dir="\${CSS.escape(base)}"]\`).remove()
+                        }
+                    }
+                // ----------------------------------------------
+                } else if (name === "folderCreated") {
+                    const project = { languages:{}, starred: false, framework: "" }
+                    const [base, proj] = data
+                    const article = makeProjectArticle(
+                        project,
+                        base,
+                        proj
+                    )
+
+                    console.log('artic',article)
+
+                    document.querySelector(\`.projects-section[data-dir="\${CSS.escape(base)}"] > .projects-wrapper > .projects\`).prepend(article)
+
+                    loadedData[base][proj] = project
+                }
+            } catch (err) {
+                console.error(err) 
             }
         })
 
@@ -204,6 +297,19 @@ export default class MyPanel {
                 const sectionHeading = document.createElement('h2')
                 sectionHeading.className = 'section-heading'
                 sectionHeading.textContent = baseDir
+
+                sectionHeading.onclick = () => {
+                    vscode.postMessage({ name: "openFolder", data: [baseDir] });
+                }
+                
+                // create folder button
+                const createFolderBtn = document.createElement('button')
+                createFolderBtn.className = 'create-folder-btn'
+                createFolderBtn.innerText = "+"
+
+                createFolderBtn.onclick = () => {
+                    vscode.postMessage({ name: "createFolder", data: [baseDir] })
+                }
                 
                 // collapse button
                 const collapseBtn = document.createElement('button')
@@ -221,8 +327,12 @@ export default class MyPanel {
                     projectsDivWrapper.classList.toggle('collapsed')
                 }
 
+                const sectionTopBtns = document.createElement('div')
+                sectionTopBtns.className = 'section-top-btns'
                 sectionTop.appendChild(sectionHeading)
-                sectionTop.appendChild(collapseBtn)
+                sectionTopBtns.appendChild(collapseBtn)
+                sectionTopBtns.appendChild(createFolderBtn)
+                sectionTop.appendChild(sectionTopBtns)
                 section.appendChild(sectionTop)
                 
 
@@ -261,7 +371,8 @@ export default class MyPanel {
         function makeProjectArticle(project, baseDir, projectName) {
             const projectArticle = document.createElement("article");
             projectArticle.className = "project";
-            projectArticle.dataset.dir = projectName;
+            projectArticle.dataset.proj = projectName;
+            projectArticle.dataset.dir = baseDir
             const iconPath = "${baseUri}" + "/" + (project.framework || 'folder-solid-full') + ".svg"
             projectArticle.innerHTML = \`
             <div class="project-head">

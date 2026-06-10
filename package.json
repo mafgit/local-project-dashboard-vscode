@@ -14,11 +14,10 @@
 		"hub"
 	],
 	"description": "View all projects in one place & open any project in a new tab without having to open it from explorer",
-	"version": "0.1.1",
+	"version": "0.1.2",
 	"license": "MIT",
 	"icon": "media/icon.png",
 	"activationEvents": [
-		"*"
 	],
 	"repository": {
 		"type": "git",
