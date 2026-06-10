@@ -108,15 +108,18 @@ export default class MyPanel {
 						});
 
 						if (!input) return;
+
+						const dirs = context.globalState.get<GlobalStateDirs>(
+							"dirs",
+							{},
+						);
+
 						try {
+							if (input in dirs[base]) return;
+
 							const uri = vscode.Uri.file(path.join(base, input));
 							await vscode.workspace.fs.createDirectory(uri);
 							// add to global state
-							const dirs =
-								context.globalState.get<GlobalStateDirs>(
-									"dirs",
-									{},
-								);
 
 							await context.globalState.update("dirs", {
 								...dirs,
