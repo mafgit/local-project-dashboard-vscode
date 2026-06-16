@@ -1,6 +1,6 @@
 body.vscode-dark {
 	--proj-bg: linear-gradient(#09162933, #100b2b34);
-	--open-btn-bg: #4586ff8c;
+	--open-btn-bg: #1466ffc5;
 	--open-btn-color: #f1f1f1;
 	--section-heading-color: #e7e7e7;
 	--section-heading-border-color: #e7e7e72d;
@@ -10,13 +10,13 @@ body.vscode-dark {
 }
 
 body.vscode-light {
-	--proj-bg: #eeeeee9c;
+	--proj-bg: #f3f3f39c;
 	--open-btn-bg: #1466ffc5;
 	--open-btn-color: #f1f1f1;
 	--section-heading-color: #1b1b1b;
 	--section-heading-border-color: #1b1b1b36;
 	--lang-color: #f1f1f1;
-	--proj-border-color: #b8b8b8a8;
+	--proj-border-color: #6e6e6e2f;
 	--unstarred-fill: #8f8f8f;
 }
 
@@ -174,6 +174,11 @@ button {
 	flex-direction: column;
 	gap: 12px;
 
+	&:hover .section-top-btns {
+		opacity: 1 !important;
+		pointer-events: all !important;
+	}
+
 	.section-top {
 		display: flex;
 		justify-content: space-between;
@@ -181,13 +186,15 @@ button {
 
 		.section-heading {
 			color: var(--section-heading-color);
-			/* font-style: italic; */
+			font-style: italic;
 			font-weight: normal;
+			font-family:
+				"Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif !important;
 			border-radius: 5px;
 			padding: 5px 10px;
 			width: max-content;
 			border: 1px solid var(--section-heading-border-color);
-			font-size: 0.8rem !important;
+			font-size: 0.9rem !important;
 
 			&:not(.starred-section-heading) {
 				cursor: pointer;
@@ -203,7 +210,22 @@ button {
 			align-items: center;
 			justify-content: center;
 			gap: 8px;
+			opacity: 0;
+			pointer-events: none;
+			transition: opacity 0.2s ease-in;
 		}
+	}
+}
+
+#starred-section {
+	margin-bottom: 30px;
+}
+
+.project:hover {
+	.project-bottom,
+	.project-top-btns {
+		opacity: 1 !important;
+		pointer-events: all !important;
 	}
 }
 
@@ -224,7 +246,7 @@ button {
 		min-height: 0;
 		display: grid;
 		grid-template-columns: 1fr 1fr 1fr 1fr;
-		gap: 10px;
+		gap: 12px;
 
 		.project {
 			background: var(--proj-bg);
@@ -233,7 +255,7 @@ button {
 			gap: 8px;
 			display: flex;
 			flex-direction: column;
-			padding: 10px;
+			padding: 12px;
 
 			.project-head {
 				display: flex;
@@ -251,9 +273,13 @@ button {
 					}
 				}
 
-				.project-btns {
+				.project-top-btns {
 					display: flex;
-					gap: 4px;
+					gap: 6px;
+
+					opacity: 0;
+					pointer-events: none;
+					transition: opacity 0.2s ease-in;
 
 					button {
 						width: 22px;
@@ -289,19 +315,20 @@ button {
 			.languages {
 				display: flex;
 				flex-wrap: wrap;
-				gap: 8px;
+				gap: 4px 8px;
 
 				.language {
 					display: flex;
 					gap: 5px;
 					justify-content: center;
 					align-items: center;
+					font-size: 0.8rem;
 					/* color: var(--lang-color); */
 
 					.language-icon {
-						width: 8px;
+						width: 6px;
 						display: flex;
-						height: 8px;
+						height: 6px;
 						background: rgb(252, 252, 252);
 						border-radius: 10px;
 
@@ -398,6 +425,10 @@ button {
 	justify-content: flex-end;
 	align-items: flex-end;
 
+	opacity: 0;
+	pointer-events: none;
+	transition: opacity 0.2s ease-in;
+
 	.open-folder-btn {
 		background: none;
 		display: flex;
@@ -407,8 +438,11 @@ button {
 	.open-btn {
 		background: var(--open-btn-bg);
 		color: var(--open-btn-color);
-		padding: 5px 10px;
+		padding: 5px;
 		border-radius: 8px;
+		display: flex;
+		justify-content: center;
+		align-items: center;
 	}
 }
 

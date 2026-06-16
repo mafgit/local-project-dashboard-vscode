@@ -1,5 +1,5 @@
 export const MAX_PROJECTS_IN_A_DIR = 60;
-export const MAX_LANGUAGES_TO_SHOW = 10;
+export const MAX_LANGUAGES_TO_SHOW = 4;
 export const MAX_DIRENTS_TO_LOOP_OVER = 22;
 
 export const IGNORE_FOLDERS = new Set([
