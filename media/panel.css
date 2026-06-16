@@ -3,6 +3,7 @@ body.vscode-dark {
 	--open-btn-bg: #4586ff8c;
 	--open-btn-color: #f1f1f1;
 	--section-heading-color: #e7e7e7;
+	--section-heading-border-color: #e7e7e72d;
 	--lang-color: #f1f1f1;
 	--proj-border-color: #7c7c7c6c;
 	--unstarred-fill: #d6d6d6;
@@ -13,6 +14,7 @@ body.vscode-light {
 	--open-btn-bg: #1466ffc5;
 	--open-btn-color: #f1f1f1;
 	--section-heading-color: #1b1b1b;
+	--section-heading-border-color: #1b1b1b36;
 	--lang-color: #f1f1f1;
 	--proj-border-color: #b8b8b8a8;
 	--unstarred-fill: #8f8f8f;
@@ -184,16 +186,16 @@ button {
 			border-radius: 5px;
 			padding: 5px 10px;
 			width: max-content;
-			border: 1px solid #535353a8;
+			border: 1px solid var(--section-heading-border-color);
 			font-size: 0.8rem !important;
 
-            &:not(.starred-section-heading) {
-                cursor: pointer;
+			&:not(.starred-section-heading) {
+				cursor: pointer;
 
-                &:hover {
-                    text-decoration: underline;
-                }
-            }
+				&:hover {
+					text-decoration: underline;
+				}
+			}
 		}
 
 		.section-top-btns {
