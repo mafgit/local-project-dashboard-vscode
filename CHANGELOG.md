@@ -9,6 +9,7 @@
 
 ## [0.1.3] - 16th Jun, 2026
 - Startup issues fixed
+- UI improvement
 
 ## [0.1.2] - 11th Jun, 2026
 - Create new project from right inside panel
