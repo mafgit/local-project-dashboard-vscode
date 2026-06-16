@@ -7,6 +7,9 @@
 - Edit folder name
 - Optimize directory scanning
 
+## [0.1.3] - 16th Jun, 2026
+- Startup issues fixed
+
 ## [0.1.2] - 11th Jun, 2026
 - Create new project from right inside panel
 - Rerendering on toggling star issue fixed

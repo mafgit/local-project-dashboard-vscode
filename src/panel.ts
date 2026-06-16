@@ -6,13 +6,12 @@ import { GlobalStateDirs } from "./GlobalStateDirs";
 
 export default class MyPanel {
 	panel: vscode.WebviewPanel | undefined;
-	panelDisposed = false;
 
 	constructor() {}
 
 	public showProjectsPanel(context: vscode.ExtensionContext) {
-		if (this.panel && !this.panelDisposed) {
-			this.panel.reveal();
+		if (this.panel) {
+			this.panel.reveal(vscode.ViewColumn.One);
 			return;
 		}
 
@@ -20,7 +19,7 @@ export default class MyPanel {
 		this.panel = vscode.window.createWebviewPanel(
 			"localProjectDashboardPanel",
 			"Local Project Dashboard",
-			vscode.ViewColumn.One,
+			{ viewColumn: vscode.ViewColumn.One, preserveFocus: true },
 			{
 				retainContextWhenHidden: true,
 				enableScripts: true,
@@ -30,15 +29,15 @@ export default class MyPanel {
 			},
 		);
 
-		this.setupPanel(context, this.panel);
+		this.setupPanel(context, this.panel, false);
 	}
 
 	public setupPanel(
 		context: vscode.ExtensionContext,
-		panel: vscode.WebviewPanel, // in case panel is passed from outside (for serialization)
+		panel: vscode.WebviewPanel,
+		isRestored: boolean,
 	) {
 		this.panel = panel;
-		this.panelDisposed = false;
 
 		this.panel.iconPath = {
 			dark: vscode.Uri.joinPath(
@@ -53,28 +52,32 @@ export default class MyPanel {
 			),
 		};
 
-		this.panel.onDidDispose(() => {
-			this.panelDisposed = true;
-			this.panel = undefined;
-		});
+		this.panel.onDidDispose(
+			() => {
+				this.panel = undefined;
+			},
+			null,
+			context.subscriptions,
+		);
 
 		const baseUri = this.panel.webview
 			.asWebviewUri(vscode.Uri.joinPath(context.extensionUri, "media"))
 			.toString();
 
-		this.panel.webview.html = this.getWebviewPanelHTML(
-			this.panel.webview.cspSource,
-			baseUri,
-		);
-
-		// send global state load message
-		const dirs: GlobalStateDirs = context.globalState.get("dirs", {});
-		if (dirs) {
-			this.panel?.webview.postMessage({
-				name: "globalStateLoad",
-				data: dirs,
-			});
-		} // todo: do this when asked by html through msg?
+		if (isRestored) {
+			setTimeout(() => {
+				if (this.panel)
+					this.panel.webview.html = this.getWebviewPanelHTML(
+						this.panel.webview.cspSource,
+						baseUri,
+					);
+			}, 0);
+		} else {
+			this.panel.webview.html = this.getWebviewPanelHTML(
+				this.panel.webview.cspSource,
+				baseUri,
+			);
+		}
 
 		// receive message
 		this.panel.webview.onDidReceiveMessage(
@@ -85,7 +88,20 @@ export default class MyPanel {
 						data,
 						"\n",
 					);
-					if (name === "openProject") {
+
+					if (name === "ready") {
+						// send global state load message
+						const dirs: GlobalStateDirs = context.globalState.get(
+							"dirs",
+							{},
+						);
+						if (dirs) {
+							this.panel?.webview.postMessage({
+								name: "globalStateLoad",
+								data: dirs,
+							});
+						}
+					} else if (name === "openProject") {
 						const uri = vscode.Uri.file(path.join(...data));
 
 						await vscode.commands.executeCommand(
@@ -220,6 +236,8 @@ export default class MyPanel {
     
     <script nonce="${nonce}">
         const vscode = acquireVsCodeApi();
+
+        vscode.postMessage({ name: "ready" });
 
         const projectSectionsContainer = document.getElementById("project-sections-container")
         const starredProjectsDiv = document.querySelector('#starred-section .projects')

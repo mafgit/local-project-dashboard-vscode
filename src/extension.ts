@@ -10,20 +10,22 @@ export async function activate(context: vscode.ExtensionContext) {
 	// on startup panel open
 	const config = vscode.workspace.getConfiguration("localProjectDashboard");
 	const showOnStartup = config.get("showOnStartup", false);
-	if (showOnStartup) {
+	if (showOnStartup && !myPanel.panel) {
 		myPanel.showProjectsPanel(context);
 	}
 
 	// disposables
 	context.subscriptions.push(
 		// refreshProjects command
-		vscode.commands.registerCommand("localProjectDashboard.refreshProjects", () =>
-			refreshProjects(context),
+		vscode.commands.registerCommand(
+			"localProjectDashboard.refreshProjects",
+			() => refreshProjects(context),
 		),
 
 		// showProjects command
-		vscode.commands.registerCommand("localProjectDashboard.showProjectsPanel", () =>
-			myPanel.showProjectsPanel(context),
+		vscode.commands.registerCommand(
+			"localProjectDashboard.showProjectsPanel",
+			() => myPanel.showProjectsPanel(context),
 		),
 
 		// sidebar view provider
@@ -33,15 +35,20 @@ export async function activate(context: vscode.ExtensionContext) {
 		),
 
 		// if user closes vscode while panel was opened, so to restore the panel UI
-        // but its causing two panels to be there, and not any real improvement in time, so leaving it 
-        // vscode.window.registerWebviewPanelSerializer(
-		// 	"localProjectDashboardPanel",
-		// 	{
-		// 		async deserializeWebviewPanel(webviewPanel, _state) {
-		// 			myPanel.setupPanel(context, webviewPanel);
-		// 		},
-		// 	},
-		// ),
+		vscode.window.registerWebviewPanelSerializer(
+			"localProjectDashboardPanel",
+			{
+				async deserializeWebviewPanel(webviewPanel, _state) {
+					if (myPanel.panel) {
+						// if already exists, no need for the one that was recovered
+						webviewPanel.dispose();
+						return;
+					}
+
+					myPanel.setupPanel(context, webviewPanel, true); // rehydrate the recovered panel
+				},
+			},
+		),
 	);
 }
 
